@@ -1,0 +1,12 @@
+[
+    {
+        "symbol": "name or spritename or anything that help to see on screen",
+        "tag":
+        [
+            "tag1",
+            "tag2"
+        ],
+        "x":0,
+        "y":0
+    }
+]
