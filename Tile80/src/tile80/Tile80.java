@@ -6,6 +6,10 @@
 
 package tile80;
 
+import com.google.common.collect.ImmutableList;
+import java.util.List;
+import org.javatuples.Pair;
+
 /**
  *
  * @author martin
@@ -17,6 +21,8 @@ public class Tile80 {
      */
     public static void main(String[] args) {
         System.out.println("hellogit");
+        Pair p;
+        List l = ImmutableList.of();
     }
     
 }
