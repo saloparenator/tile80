@@ -4,11 +4,12 @@
  * and open the template in the editor.
  */
 
-package example;
+package ucigame.example;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
@@ -18,9 +19,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.javatuples.Pair;
+import tile80.SpriteFactory;
+import ucigame.tile80.SpriteFactoryUciGame;
 import tile80.Tile;
-import tile80.TileUciGame;
-import tile80.Tool;
+import tool.Json;
 import ucigame.Sprite;
 import ucigame.Ucigame;
 
@@ -28,7 +30,7 @@ import ucigame.Ucigame;
  *
  * @author martin
  */
-public class GameOfLife extends TileUciGame{
+public class GameOfLife extends Ucigame{
     public static Set<Pair> iterate(final Set<Pair> world)
     {
         Function<Pair, Iterable<Pair>> getAliveNeighbor = new Function<Pair, Iterable<Pair>>(){
@@ -64,9 +66,9 @@ public class GameOfLife extends TileUciGame{
         return b.build();
     }
     
-    private static final Logger LOG = Logger.getLogger(TileUciGame.class.getName());
+    private static final Logger LOG = Logger.getLogger(SpriteFactoryUciGame.class.getName());
     
-    Map <String,Sprite> mapSprite;
+    Map <String,SpriteFactoryUciGame> mapSprite;
     
     Set<Pair> world;
     Collection<Pair> click;
@@ -80,8 +82,8 @@ public class GameOfLife extends TileUciGame{
         framerate(5);
         canvas.background(0);
         
-        String json = Tool.loadFileJson("data/abandonauts.json");
-        mapSprite = loadSpriteSheet(json,8,8);
+        String json = Json.loadFileJson("data/tiles.json");
+        mapSprite = SpriteFactoryUciGame.makeSpriteMapFactoryUciGame(this,json,8,8);
         
         world = ImmutableSet.of();
         click = new ArrayList<>();
@@ -96,8 +98,8 @@ public class GameOfLife extends TileUciGame{
         ImmutableSet.Builder b = ImmutableSet.builder();
         for (Pair<Integer,Integer> p : world)
         {
-            mapSprite.get("greenBlock").position(p.getValue0()*8, p.getValue1()*8);
-            mapSprite.get("greenBlock").draw();
+            Sprite tmp = mapSprite.get("greenBlock").makeSprite(p.getValue0()*8, p.getValue1()*8);
+            tmp.draw();
         }
 
         if(!pause)

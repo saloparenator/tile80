@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package tile80;
+package tool;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,8 +17,8 @@ import java.util.logging.Logger;
  *
  * @author martin
  */
-public final class Tool {
-    private static final Logger LOG = Logger.getLogger(Tool.class.getName());
+public final class Json {
+    private static final Logger LOG = Logger.getLogger(Json.class.getName());
     
     /**
      * load json file
