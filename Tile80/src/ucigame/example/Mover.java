@@ -26,8 +26,7 @@ public class Mover extends Ucigame{
     Map <String,Sprite80UciGame> mapTileSprite,
                                  mapAstroSprite,
                                  mapInterface;
-    Map<String,Sprite> mapSprite;
-    int col,row,lastcol,lastrow;
+    int col,row;
     
     Console80 console;
     String mode;
@@ -36,9 +35,6 @@ public class Mover extends Ucigame{
     public void setup()
     {
         col=30;row=30;
-        lastcol=col;
-        lastrow=row;
-        mapSprite = new HashMap<>();
         
         window.size(1024, 512);
         window.title("move with arrow");
@@ -46,13 +42,11 @@ public class Mover extends Ucigame{
         framerate(30);
         canvas.background(0);
 
-        mapTileSprite = Sprite80UciGame.makeSpriteFactoryUciGame(this,Json.loadFileJson("data/tiles.json"),8,8);
-        mapAstroSprite = Sprite80UciGame.makeSpriteFactoryUciGame(this,Json.loadFileJson("data/astro.json"), 8, 8);
-        mapInterface = Sprite80UciGame.makeSpriteFactoryUciGame(this, Json.loadFileJson("data/cursor.json"), 8, 8);
+        mapTileSprite = Sprite80UciGame.makeSpriteFactoryUciGame(this,Json.loadFileJson("data/tiles.json"));
+        mapAstroSprite = Sprite80UciGame.makeSpriteFactoryUciGame(this,Json.loadFileJson("data/astro.json"));
+        mapInterface = Sprite80UciGame.makeSpriteFactoryUciGame(this, Json.loadFileJson("data/cursor.json"));
         
         console = new Console80UciGame(this, "Monospaced", 8, 255, 255, 255, 200);
-        mapSprite.put("player", mapAstroSprite.get("astroWalk").makeSprite(col, row) );
-        mapSprite.put("cursor", mapInterface.get("cursor").makeSprite(512,255));
         
         mode ="player";
     }
@@ -61,30 +55,10 @@ public class Mover extends Ucigame{
     public void draw()
     {
             canvas.clear();
-            for (Sprite spr : mapSprite.values()){
-                spr.draw();
-            }
+            mapAstroSprite.get("astroWalk").makeSprite(col, row).draw();
             console.draw(0, 8, 3);
     }
 
-    @Override
-    public void onKeyRelease(){
-        if (keyboard.isDown(keyboard.Q)){
-            console.addMessage("tab pressed");
-            if (mode.equals("player")){
-                mode="edit";
-                lastcol=col;
-                lastrow=row;
-                console.addMessage("player mode");
-            }
-            else{
-                mode="player";
-                col=lastcol;
-                row=lastrow;
-                console.addMessage("edit mode");
-            }
-        }
-    }
     @Override
     public void onKeyPress()
     {
@@ -96,16 +70,7 @@ public class Mover extends Ucigame{
             col--;
         if (keyboard.isDown(keyboard.RIGHT, keyboard.D))
             col++;
-        console.addMessage("keyboard("+lastcol+","+lastrow+")=>("+col+","+row+")");
-        if (mode.equals("player")){
-           if (lastcol!=col || lastrow!=row)
-                mapSprite.put("player", mapAstroSprite.get(lastcol-col>0?"astroWalk2":"astroWalk").makeSprite(col, row) );
-        }
-        else
-        {
-            mapSprite.get("cursor").nextX(col*8);
-            mapSprite.get("cursor").nextY(row*8);
-        }
+        console.addMessage("keyboard("+col+","+row+")");
      }
 
 }

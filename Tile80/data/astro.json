@@ -1,139 +1,35 @@
 {
-    "file": "data/astro.png",
-    "sheet":
-    [
-        {
-            "name":"astroWalk",
-            "frame":
-            [
-                {
-                    "x":1,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                },
-                {
-                    "x":1,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                },
-                {
-                    "x":11,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                },
-                {
-                    "x":21,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                },
-                {
-                    "x":31,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                },
-                {
-                    "x":41,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                },
-                {
-                    "x":51,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                }
-            ]
-        },
-        {
-            "name":"astroJump",
-            "frame":
-            [
-                {
-                    "x":61,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                }
-            ]
-        },
-        {
-            "name":"astroFall",
-            "frame":
-            [
-                {
-                    "x":71,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                }
-            ]
-        },
-        {
-            "name":"astroCrouch",
-            "frame":
-            [
-                {
-                    "x":81,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                }
-            ]
-        },
-        {
-            "name":"astroCrouchWalk",
-            "frame":
-            [
-                {
-                    "x":91,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                },
-                {
-                    "x":101,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                },
-                {
-                    "x":111,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                },
-                {
-                    "x":121,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                },
-                {
-                    "x":131,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                }
-            ]
-        },
-        {
-            "name":"astroLie",
-            "frame":
-            [
-                {
-                    "x":141,
-                    "y":1,
-                    "w":8,
-                    "h":8
-                }
-            ]
-        }
-        
-    ]
+"file": "data/astro2.png","w":8,"h":8,
+"sheet":[
+{"name":"astroWalk","x":1,"y":1},
+{"name":"astroWalk2","x":11,"y":1},
+{"name":"astroWalk3","x":21,"y":1},
+{"name":"astroWalk4","x":31,"y":1},
+{"name":"astroWalk5","x":41,"y":1},
+{"name":"astroWalk6","x":51,"y":1},
+{"name":"astroJump","x":61,"y":1},
+{"name":"astroFall","x":71,"y":1},
+{"name":"astroCrouch","x":81,"y":1},
+{"name":"astroCrawl","x":91,"y":1},
+{"name":"astroCrawl2","x":101,"y":1},
+{"name":"astroCrawl3","x":111,"y":1},
+{"name":"astroCrawl4","x":121,"y":1},
+{"name":"astroCrawl5","x":131,"y":1},
+{"name":"astroLie","x":141,"y":1},
+{"name":"astroWalkL","x":141,"y":11},
+{"name":"astroWalkL2","x":131,"y":11},
+{"name":"astroWalkL3","x":121,"y":11},
+{"name":"astroWalkL4","x":111,"y":11},
+{"name":"astroWalkL5","x":101,"y":11},
+{"name":"astroWalkL6","x":91,"y":11},
+{"name":"astroJumpL","x":81,"y":11},
+{"name":"astroFallL","x":71,"y":11},
+{"name":"astroCrouchL","x":61,"y":11},
+{"name":"astroCrawlL","x":51,"y":11},
+{"name":"astroCrawlL2","x":41,"y":11},
+{"name":"astroCrawlL3","x":31,"y":11},
+{"name":"astroCrawlL4","x":21,"y":11},
+{"name":"astroCrawlL5","x":11,"y":11},
+{"name":"astroLieL","x":1,"y":11}
+]
 }

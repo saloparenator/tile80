@@ -16,45 +16,15 @@ import org.javatuples.Pair;
  * build a sprite from sprite sheet with animation/reflection/translation
  */
 public abstract class Sprite80<T> {
-
-
-    //example of factory
-//    public Map<String,SpriteFactoryUciGame> makeSpriteFactoryUciGame(Ucigame host, String json, int w, int h){
-//        ImmutableMap.Builder<String,SpriteFactoryUciGame> mapSpriteBuilder = ImmutableMap.builder();
-//        
-//        Map<String,Object> spriteSheetStructure = new Gson().fromJson(json, Map.class);
-//        Image spriteSheetImage = host.getImage(spriteSheetStructure.get("file").toString());
-//        for (Map<String,Object> frameStructure : (Collection<Map>)spriteSheetStructure.get("sheet"))
-//        {
-//            ImmutableList.Builder<Pair<Integer,Integer>> frameListBuilder = ImmutableList.builder();
-//            for (Map<String, Double> box : (Collection<Map>)frameStructure.get("frame")){
-//               frameListBuilder.add(new Pair(box.get("x").intValue(), 
-//                                             box.get("y").intValue()));
-//            }
-//            mapSpriteBuilder.put(frameStructure.get("name").toString(),            
-//                                   new SpriteFactoryUciGame(spriteSheetImage,
-//                                                            host,
-//                                                            frameStructure.get("name").toString(), 
-//                                                            frameStructure.containsKey("mirror"), 
-//                                                            w, 
-//                                                            h, 
-//                                                            frameListBuilder.build()));
-//        }
-//        
-//        return mapSpriteBuilder.build();
-//    }
-
     private final String name;
-    private final boolean loop;
-    private final int w,h;
-    private final List<Pair<Integer,Integer>> frameLst;
+    private final int w,h,x,y;
 
-    public Sprite80(String name, boolean loop, int w, int h, List<Pair<Integer,Integer>> frameLst) {
+    public Sprite80(String name, int w, int h, int x, int y){
         this.name = name;
-        this.loop = loop;
         this.w = w;
         this.h = h;
-        this.frameLst = frameLst;
+        this.x=x;
+        this.y=y;
     }
 
     /**
@@ -81,30 +51,14 @@ public abstract class Sprite80<T> {
         return h;
     }
 
-    /**
-     * true if the sprite is flip horizontally from original
-     * @return 
-     */
-    public boolean isLoop(){
-        return loop;
+    public int getX() {
+        return x;
     }
 
-    /**
-     * immutable list of all frame the sprite will animate
-     * @return 
-     */
-    public List<Pair<Integer,Integer>> getFrameList(){
-        return ImmutableList.copyOf(frameLst);
+    public int getY() {
+        return y;
     }
-    
-    /**
-     * build in place the sprite using all information stored here
-     * @param x consider this coordinate as col of getW() width
-     * @param y same for height, your sprite cant be between tile
-     * @return 
-     */
-//    public abstract T makeSprite(int x, int y);
-    
+
     /**
      * build in place the sprite using all information stored here
      * @param x consider this coordinate as col of getW() width

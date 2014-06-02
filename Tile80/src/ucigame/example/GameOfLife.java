@@ -83,7 +83,7 @@ public class GameOfLife extends Ucigame{
         canvas.background(0);
         
         String json = Json.loadFileJson("data/tiles.json");
-        mapSprite = Sprite80UciGame.makeSpriteFactoryUciGame(this,json,8,8);
+        mapSprite = Sprite80UciGame.makeSpriteFactoryUciGame(this,json);
         
         world = ImmutableSet.of();
         click = new ArrayList<>();
