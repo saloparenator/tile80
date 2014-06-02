@@ -1,0 +1,29 @@
+ * lets start with a fuck the mouse user interface paradigm
+ * 
+ * message box, just print message queue on screen
+ * menu zone
+ * sprite factory must support animation
+ * sprite queue , repeatly redraw same sprite will do the animation
+ *                the factory shit only a new sprite when we need to change it
+ * soundbank factory
+ * user input infrastructure
+ * 
+ * a character that move on screen while you can place block on screen so the character can jump on
+
+
+button control
+    need flagged input (like what we already have)
+    need pulse input (non continous, only consider first button down and go up if you read)
+        managing all of them by name could be easy and configurable with json
+
+animation control
+    if i want to use animation from ucigame
+        or i use a sprite map and i manage when the sprite is changed
+        or i build my own animation framework where the game tell what to animate
+
+sound control
+    because i cant segment audio stream, i will have to load many sound effect
+    only play/stop with sample name
+
+state machine
+    state machine design pattern

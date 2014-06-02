@@ -6,24 +6,16 @@
 
 package tile80;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import org.javatuples.Pair;
-import ucigame.Image;
-import ucigame.Sprite;
-import ucigame.Ucigame;
 
 /**
  * Simple container that keep all information required from JSON into object
  * Implementation will declare makeSprite(x,y) that will (according to library)
  * build a sprite from sprite sheet with animation/reflection/translation
  */
-public abstract class SpriteFactory<T> {
+public abstract class Sprite80<T> {
 
 
     //example of factory
@@ -53,13 +45,13 @@ public abstract class SpriteFactory<T> {
 //    }
 
     private final String name;
-    private final boolean mirror;
+    private final boolean loop;
     private final int w,h;
     private final List<Pair<Integer,Integer>> frameLst;
 
-    public SpriteFactory(String name, boolean mirror, int w, int h, List<Pair<Integer,Integer>> frameLst) {
+    public Sprite80(String name, boolean loop, int w, int h, List<Pair<Integer,Integer>> frameLst) {
         this.name = name;
-        this.mirror = mirror;
+        this.loop = loop;
         this.w = w;
         this.h = h;
         this.frameLst = frameLst;
@@ -93,8 +85,8 @@ public abstract class SpriteFactory<T> {
      * true if the sprite is flip horizontally from original
      * @return 
      */
-    public boolean idMirror(){
-        return mirror;
+    public boolean isLoop(){
+        return loop;
     }
 
     /**
@@ -104,6 +96,14 @@ public abstract class SpriteFactory<T> {
     public List<Pair<Integer,Integer>> getFrameList(){
         return ImmutableList.copyOf(frameLst);
     }
+    
+    /**
+     * build in place the sprite using all information stored here
+     * @param x consider this coordinate as col of getW() width
+     * @param y same for height, your sprite cant be between tile
+     * @return 
+     */
+//    public abstract T makeSprite(int x, int y);
     
     /**
      * build in place the sprite using all information stored here

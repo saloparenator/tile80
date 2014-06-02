@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package tile80;
+package tool;
 
 import tool.Yield;
 import org.javatuples.Pair;

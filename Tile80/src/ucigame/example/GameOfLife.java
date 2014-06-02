@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.javatuples.Pair;
-import tile80.SpriteFactory;
-import ucigame.tile80.SpriteFactoryUciGame;
-import tile80.Tile;
+import tile80.Sprite80;
+import ucigame.tile80.Sprite80UciGame;
+import tile80.Tile80;
 import tool.Json;
 import ucigame.Sprite;
 import ucigame.Ucigame;
@@ -36,14 +36,14 @@ public class GameOfLife extends Ucigame{
         Function<Pair, Iterable<Pair>> getAliveNeighbor = new Function<Pair, Iterable<Pair>>(){
             @Override
             public Iterable<Pair> apply(Pair input) {
-                return Iterables.filter(Tile.getNeighbor(input),Predicates.not(Predicates.in(world)));
+                return Iterables.filter(Tile80.getNeighbor(input),Predicates.not(Predicates.in(world)));
             }
         };
         Predicate<Pair> ifThereIsReproduction = new Predicate<Pair>(){
             @Override
             public boolean apply(Pair input) {
                 int count = Iterables.size(
-                            Iterables.filter(Tile.getNeighbor(input),
+                            Iterables.filter(Tile80.getNeighbor(input),
                                              Predicates.in(world)));
                 return count ==3;
             }
@@ -52,7 +52,7 @@ public class GameOfLife extends Ucigame{
             @Override
             public boolean apply(Pair input) {
                 int count = Iterables.size(
-                            Iterables.filter(Tile.getNeighbor(input),
+                            Iterables.filter(Tile80.getNeighbor(input),
                                              Predicates.in(world)));
                 return count==3 || count==2;
             }
@@ -66,9 +66,9 @@ public class GameOfLife extends Ucigame{
         return b.build();
     }
     
-    private static final Logger LOG = Logger.getLogger(SpriteFactoryUciGame.class.getName());
+    private static final Logger LOG = Logger.getLogger(Sprite80UciGame.class.getName());
     
-    Map <String,SpriteFactoryUciGame> mapSprite;
+    Map <String,Sprite80UciGame> mapSprite;
     
     Set<Pair> world;
     Collection<Pair> click;
@@ -83,7 +83,7 @@ public class GameOfLife extends Ucigame{
         canvas.background(0);
         
         String json = Json.loadFileJson("data/tiles.json");
-        mapSprite = SpriteFactoryUciGame.makeSpriteMapFactoryUciGame(this,json,8,8);
+        mapSprite = Sprite80UciGame.makeSpriteFactoryUciGame(this,json,8,8);
         
         world = ImmutableSet.of();
         click = new ArrayList<>();
