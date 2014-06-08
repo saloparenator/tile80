@@ -16,7 +16,7 @@ public abstract class Yield<T> implements Iterable<T>{
     private final Iterator<T> iterator = new Iterator<T>() {
         @Override
         public boolean hasNext() {
-            return end();
+            return !end();
         }
         @Override
         public T next() {
@@ -42,13 +42,17 @@ public abstract class Yield<T> implements Iterable<T>{
             this.from=from;
             this.to=to;
             this.step=step;
-            current=from;
+            this.current=from;
         }
         public static Yield<Integer> size(int size){
+            if (size<0)
+                return new Range(0,size,-1);
             return new Range(0,size,1);
         }
         public static Yield<Integer> fromTo(int from, int to){
-            return new Range(from,to,1);
+            if (from<to)
+                return new Range(from,to,1);
+            return new Range(from,to,-1);
         }
         public static Yield<Integer> fromToStepping(int from, int to, int step){
             return new Range(from,to,step);
@@ -56,16 +60,41 @@ public abstract class Yield<T> implements Iterable<T>{
 
         @Override
         public boolean end() {
-            if (step>0)
-                return current>=to;
-            return current<=from;
+            if (this.step==0)
+                return true;
+            else if (this.step>0)
+                return this.current>=this.to;
+            return this.current<=this.to;
         }
 
         @Override
         public Integer yield() {
-            int tmp = current;
-            current+=step;
+            int tmp = this.current;
+            this.current+=this.step;
             return tmp;
+        }
+    }
+    
+    public static class Immed<T> extends Yield<T>{
+        public final T[] array;
+        int pos;
+        private Immed(T ... arg){
+            array = arg;
+            pos=0;
+        }
+        
+        public static<T> Yield<T> Of(T ... arg){
+            return new Immed(arg);
+        }
+
+        @Override
+        public boolean end() {
+            return pos==array.length;
+        }
+
+        @Override
+        public T yield() {
+            return array[pos++];
         }
     }
 }

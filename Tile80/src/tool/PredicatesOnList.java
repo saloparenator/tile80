@@ -8,7 +8,6 @@ package tool;
 
 import com.google.common.base.Predicate;
 import java.util.Collection;
-import tile80.Tile80;
 
 /**
  *

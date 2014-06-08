@@ -14,10 +14,10 @@ import org.javatuples.Pair;
  * @author martin
  */
 public final class Coord {
-    public static class Neighbor extends Yield<Pair<Integer,Integer>>{
+    public static class Neighbor extends Yield<Pair>{
         private final Pair<Integer,Integer> center;
         int i;
-        public Neighbor(Pair<Integer,Integer> center){
+        public Neighbor(Pair center){
             this.center=center;
             i=0;
         }
@@ -26,7 +26,7 @@ public final class Coord {
             return i<9;
         }
         @Override
-        public Pair<Integer, Integer> yield() {
+        public Pair yield() {
             Pair p = new Pair(center.getValue0()+i%3-1,
                               center.getValue1()+i/3-1);
             i += 1+(i==3?1:0);

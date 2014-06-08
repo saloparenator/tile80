@@ -9,7 +9,6 @@ package ucigame.example;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
@@ -19,9 +18,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.javatuples.Pair;
-import tile80.Sprite80;
+import tool.Coord;
 import ucigame.tile80.Sprite80UciGame;
-import tile80.Tile80;
 import tool.Json;
 import ucigame.Sprite;
 import ucigame.Ucigame;
@@ -36,14 +34,14 @@ public class GameOfLife extends Ucigame{
         Function<Pair, Iterable<Pair>> getAliveNeighbor = new Function<Pair, Iterable<Pair>>(){
             @Override
             public Iterable<Pair> apply(Pair input) {
-                return Iterables.filter(Tile80.getNeighbor(input),Predicates.not(Predicates.in(world)));
+                return Iterables.filter(new Coord.Neighbor(input),Predicates.not(Predicates.in(world)));
             }
         };
         Predicate<Pair> ifThereIsReproduction = new Predicate<Pair>(){
             @Override
             public boolean apply(Pair input) {
                 int count = Iterables.size(
-                            Iterables.filter(Tile80.getNeighbor(input),
+                            Iterables.filter(new Coord.Neighbor(input),
                                              Predicates.in(world)));
                 return count ==3;
             }
@@ -52,7 +50,7 @@ public class GameOfLife extends Ucigame{
             @Override
             public boolean apply(Pair input) {
                 int count = Iterables.size(
-                            Iterables.filter(Tile80.getNeighbor(input),
+                            Iterables.filter(new Coord.Neighbor(input),
                                              Predicates.in(world)));
                 return count==3 || count==2;
             }
