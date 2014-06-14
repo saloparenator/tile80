@@ -16,6 +16,10 @@
 
 package tile80;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import java.util.Collection;
 import org.javatuples.Pair;
 
@@ -23,117 +27,245 @@ import org.javatuples.Pair;
  *
  * @author martin
  */
-public interface Tile80 {
+public abstract class Tile80 {
+    public static Tile80 nothing = new Tile80(){
+        @Override
+        public Pair<Integer, Integer> getPos() {
+            throw new UnsupportedOperationException("Nothing");
+        }
 
+        @Override
+        public int getX() {
+            throw new UnsupportedOperationException("Nothing");
+        }
 
+        @Override
+        public int getY() {
+            throw new UnsupportedOperationException("Nothing");
+        }
+
+        @Override
+        public String getId() {
+            return "";
+        }
+
+        @Override
+        public Iterable<Tag80> getTags() {
+            return ImmutableSet.of();
+        }
+
+        @Override
+        public Tile80 movePos(int x, int y) {
+            return this;
+        }
+
+        @Override
+        public Tile80 movePos(Pair<Integer,Integer> pos) {
+            return this;
+        }
+
+        @Override
+        public Tile80 setPos(int x, int y) {
+            return this;
+        }
+
+        @Override
+        public Tile80 setPos(Pair<Integer,Integer> pos) {
+            return this;
+        }
+
+        @Override
+        public Tile80 addTag(Tag80 tag) {
+            return this;
+        }
+
+        @Override
+        public Tile80 removeTag(Tag80 tag) {
+            return this;
+        }
+        
+    };
+            
+    public static Tile80 from(Pair<Integer, Integer> pos, String id, Iterable<Tag80> tagLst){
+        return new byValue(pos, id, tagLst);
+    }
+    private static class byValue extends Tile80{
+        private final Pair<Integer,Integer> pos;
+        private final String id;
+        private final Iterable<Tag80> tagLst;
+
+        public byValue(Pair<Integer, Integer> pos, String id, Iterable<Tag80> tagLst) {
+            this.pos = pos;
+            this.id = id;
+            this.tagLst = tagLst;
+        }
+        @Override
+        public Pair<Integer, Integer> getPos() {
+            return pos;
+        }
+
+        @Override
+        public int getX() {
+            return pos.getValue0();
+        }
+
+        @Override
+        public int getY() {
+            return pos.getValue1();
+        }
+
+        @Override
+        public String getId() {
+            return id;
+        }
+
+        @Override
+        public Iterable<Tag80> getTags() {
+            return tagLst;
+        }
+
+        @Override
+        public Tile80 movePos(int x, int y) {
+            return new byValue(new Pair(getX()+x,getY()+y),
+                               getId(),
+                               getTags());
+        }
+
+        @Override
+        public Tile80 movePos(Pair<Integer,Integer> rpos) {
+            return new byValue(new Pair(getX()+rpos.getValue0(),
+                                        getY()+rpos.getValue1()),
+                               getId(),
+                               getTags());
+        }
+
+        @Override
+        public Tile80 setPos(int x, int y) {
+            return new byValue(new Pair(x,y),
+                               getId(),
+                               getTags());
+        }
+
+        @Override
+        public Tile80 setPos(Pair<Integer,Integer> npos) {
+            return new byValue(npos,
+                               getId(),
+                               getTags());
+        }
+
+        @Override
+        public Tile80 addTag(Tag80 tag) {
+            return new byValue(getPos(),
+                               getId(),
+                               Iterables.concat(ImmutableSet.of(tag),getTags()));    
+        }
+
+        @Override
+        public Tile80 removeTag(Tag80 tag) {
+            return new byValue(getPos(),
+                               getId(),
+                               FluentIterable.from(getTags())
+                                             .filter(Predicates.not(Predicates.equalTo(tag))));    
+        }
+        
+    };     
+          
+            
     /**
-     * return the coordinate were the symbol is located
-     * @param symbol
-     * @return
+     * getter
+     * return the position Pair
+     * @return pair
      */
-    Pair getCoordBySymbol(String symbol);
-
+    public abstract Pair<Integer,Integer> getPos();
     /**
-     * all coordinate occupied in the world
-     * @return
+     * getter
+     * return the x pos
+     * @return x
      */
-    Iterable<Pair> getCoordLst();
-
+    public abstract int getX();
     /**
-     * get symbol by coordinate
-     * @param coord
-     * @return
+     * getter
+     * return the y pos
+     * @return y
      */
-    String getSymbolByCoord(Pair coord);
-
+    public abstract int getY();
     /**
-     * get all symbol were coordinate is between topleft and bottomright
-     * @param topLeft
-     * @param bottomRight
-     * @return
+     * getter
+     * return the unique id
+     * @return id
      */
-    Iterable<String> getSymbolByRect(Pair topLeft, Pair bottomRight);
-
+    public abstract String getId();
     /**
-     * all symbol in the world
-     * @return
+     * getter
+     * return a collection of tag associated to the tile
+     * @return iterable<tag>
      */
-    Iterable<String> getSymbolLst();
-
-    /**
-     * all symbol with at least one of these tag
-     * @param tag
-     * @return
-     */
-    Iterable<String> getSymbolLstByAnyTag(Collection<String> tag);
-
-    /**
-     * all symbol containing this tag
-     * @param tag
-     * @return
-     */
-    Iterable<String> getSymbolLstByTag(String tag);
-
-    /**
-     * all symbol containing all tag given
-     * @param taglst
-     * @return
-     */
-    Iterable<String> getSymbolLstByTagLst(Collection<String> taglst);
-
-    /**
-     * all symbol adjacent to given one
-     * @param symbol
-     * @return
-     */
-    Iterable<String> getSymbolNeighbor(String symbol);
-
-    /**
-     * get all tag that the given symbol contain
-     * @param symbol
-     * @return
-     */
-    Iterable<String> getTagBySymbol(String symbol);
-
-    /**
-     * get all tag that exist in this world
-     * @return
-     */
-    Iterable<String> getTagLst();
-
-    /**
-     * 
-     * @param symbol
-     * @param x
-     * @param y 
-     */
-    Tile80 moveSymbol(String symbol, int x, int y);
-
-    /**
-     * 
-     * @param symbol
-     * @param tag 
-     */
-    Tile80 addTag(String symbol, String tag);
+    public abstract Iterable<Tag80> getTags();
     
     /**
-     * 
-     * @param symbol
-     * @param tag 
+     * mutator return a modified copy
+     * @param x relative x movement
+     * @param y relative y movement
+     * @return  new version of the object
      */
-    Tile80 removeTag(String symbol, String tag);
+    public abstract Tile80 movePos(int x, int y);
+    /**
+     * mutator return a modified copy
+     * @param pos relative position Pair movement
+     * @return  new version of the object
+     */
+    public abstract Tile80 movePos(Pair<Integer,Integer> pos);
+    /**
+     * mutator return a modified copy
+     * @param x new x position
+     * @param y new y position
+     * @return  new version of the object
+     */
+    public abstract Tile80 setPos(int x, int y);
+    /**
+     * mutator return a modified copy
+     * @param pos new position pair
+     * @return  new version of the object
+     */
+    public abstract Tile80 setPos(Pair<Integer,Integer> pos);
     
     /**
-     * insert a new symbol in the world at given coordinate
-     * @param symbol
-     * @param x
-     * @param y 
+     * mutator return a modified copy
+     * @param tag the tag to add to the collection
+     * @return  new version of the object
      */
-    Tile80 addSymbol(String symbol, int x, int y);
-    
+    public abstract Tile80 addTag(Tag80 tag);
     /**
-     * remove symbol from the world
-     * @param symbol 
+     * mutator return a modified copy
+     * @param tag the tag to remove
+     * @return  new version of the object
      */
-    Tile80 removeSymbol(String symbol);
+    public abstract Tile80 removeTag(Tag80 tag);
+    
+    @Override
+    public int hashCode(){
+        int h = 13 * getPos().hashCode();
+        h += h*17 + 13*getId().hashCode();
+        h += h*17 + 13*getTags().hashCode();
+        return h;
+    }
+    
+    public boolean equals(Object o){
+        if (o==null || !(o instanceof Tile80))
+            return false;
+        if (o==this)
+            return true;
+        Tile80 t = (Tile80)o;
+        if (t.getId().equals(this.getId()) &&
+            t.getPos().equals(this.getPos())){
+            for (Tag80 tag : t.getTags())
+                if (!Iterables.contains(this.getTags(), tag))
+                    return false;
+            for(Tag80 tag:this.getTags())
+                if (!Iterables.contains(t.getTags(), tag))
+                    return false;
+            return true;
+        }
+        return false;
+    }
 }

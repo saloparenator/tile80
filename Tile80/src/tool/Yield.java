@@ -97,4 +97,15 @@ public abstract class Yield<T> implements Iterable<T>{
             return array[pos++];
         }
     }
+    
+    public static Yield empty = new Yield(){
+        @Override
+        public boolean end() {
+            return true;
+        }
+        @Override
+        public Object yield() {
+            return null;
+        }  
+    };
 }

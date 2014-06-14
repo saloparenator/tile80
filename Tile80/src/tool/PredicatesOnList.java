@@ -7,6 +7,7 @@
 package tool;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import java.util.Collection;
 
 /**
@@ -47,18 +48,18 @@ public final class PredicatesOnList {
         return new ContainsOne<>(from);
     }
     
-    private static class Contains<T> implements Predicate<Collection<T>>{
+    private static class Contains<T> implements Predicate<Iterable<T>>{
         private final T from;
         public Contains(T from) {
             this.from=from;
         }
 
         @Override
-        public boolean apply(Collection<T> input) {
-            return input.contains(from);
+        public boolean apply(Iterable<T> input) {
+            return Iterables.contains(input,from);
         }
     }
-    public static<T> Predicate<Collection<T>> contains(T from){
+    public static<T> Predicate<Iterable<T>> contains(T from){
         return new Contains<>(from);
     }
 }

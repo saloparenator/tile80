@@ -17,6 +17,7 @@
 package tool;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.BiMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
@@ -31,7 +32,7 @@ import java.util.Set;
  * @param <A> first type
  * @param <B> second type
  */
-public class Graph<A,B> {
+public class Graph<A,B>{
     private final Multimap<A,B> left;
     private final Multimap<B,A> right;
     
@@ -40,6 +41,13 @@ public class Graph<A,B> {
         right=HashMultimap.create();
     }
     
+    public Iterable<A> leftSet(){
+        return left.keySet();
+    }
+    
+    public Iterable<B> rightSet(){
+        return right.keySet();
+    }
     /**
      * link two object together
      * @param a first object

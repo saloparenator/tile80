@@ -54,9 +54,9 @@ public class Mover extends Ucigame{
     @Override
     public void draw()
     {
-            canvas.clear();
-            mapAstroSprite.get("astroWalk").makeSprite(col, row).draw();
-            console.draw(0, 8, 3);
+        canvas.clear();
+        mapAstroSprite.get("astroWalk").makeSprite(col, row).draw();
+        console.draw(0, 8, 3);
     }
 
     @Override
