@@ -21,57 +21,53 @@ import com.google.common.base.Functions;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
-import com.google.common.collect.BiMap;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Range;
 import java.util.Collection;
 import java.util.Set;
 import org.javatuples.Pair;
-import tool.Graph;
+import tool.ImmutableGraph;
 
 /**
- *
+ * Pair<1--1>Symbol<N--N>Tag
+ *      
+ * 
  * @author martin
  */
 public class World80Graph implements World80{
-    private final Graph<String,Tag80> graph;
-    private final BiMap<String,Pair> coord;
+    private final ImmutableGraph<String,Tag80> graph;
+    private final ImmutableBiMap<String,Pair<Integer,Integer>> coord;
 
-    public World80Graph() {
-        graph = new Graph();
-        coord = HashBiMap.create();
-
+    private World80Graph(ImmutableGraph<String, Tag80> graph, 
+                            ImmutableBiMap<String, Pair<Integer,Integer>> coord) {
+        this.graph = graph;
+        this.coord = coord;
+    }
+    
+    public static World80Graph.Builder builder(){
+        return new World80Graph.Builder();
+    }
+    
+    @Override
+    public String getDefaultId() {
+        return "";
     }
 
     @Override
-    public Pair getCoordBySymbol(String symbol) {
+    public Tag80 getDefaultTags() {
+        return Tag80.nothing;
+    }
+
+    @Override
+    public Pair getDefaultPos() {
+        return new Pair(null,null);
+    }
+    
+    @Override
+    public Pair getPosById(String symbol) {
         Preconditions.checkNotNull(symbol);
-        return Objects.firstNonNull(coord.get(symbol),new Pair(0,0));
-    }
-
-    @Override
-    public Iterable<Pair> getCoordLst() {
-        return coord.values();
-    }
-
-    @Override
-    public String getSymbolByCoord(Pair pos) {
-        Preconditions.checkNotNull(pos);
-        return Objects.firstNonNull(coord.inverse().get(pos),getSymbolDefault());
-    }
-
-    @Override
-    public Iterable<String> getSymbolByRect(Pair topLeft, Pair bottomRight) {
-        Preconditions.checkNotNull(topLeft,bottomRight);
-        return FluentIterable.from(coord.values())
-                             .filter(Range.closed(topLeft,bottomRight))
-                             .transform(Functions.forMap(coord.inverse()));
-    }
-
-    @Override
-    public Iterable<String> getSymbolLst() {
-        return graph.leftSet();
+        return Objects.firstNonNull(coord.get(symbol),getDefaultPos());
     }
 
     private Function<Tag80,Set<String>> getTagSymbolFunc(){
@@ -84,112 +80,87 @@ public class World80Graph implements World80{
     }
 
     @Override
-    public Iterable<String> getSymbolLstByTag(Tag80 tag) {
-        Preconditions.checkNotNull(tag);
-        return graph.neighborRight(tag);
-    }
-
-    @Override
-    public Iterable getSymbolNeighbor(String symbol) {
-        Preconditions.checkNotNull(symbol);
-        Pair<Integer,Integer> center = getCoordBySymbol(symbol),
-                              topLeft = new Pair(center.getValue0()-1,center.getValue1()-1),
-                              bottomRight = new Pair(center.getValue0()+1,center.getValue1()+1);
-        Predicate inRect = Range.closed(topLeft,bottomRight);
-        return FluentIterable.from(coord.keySet())
-                             .filter(inRect)
-                             .transform(Functions.forMap(coord));
-    }
-
-    @Override
-    public Iterable<Tag80> getTagBySymbol(String symbol) {
+    public Iterable<Tag80> getTagById(String symbol) {
         Preconditions.checkNotNull(symbol);
         return graph.neighborLeft(symbol);
     }
 
     @Override
-    public Iterable<Tag80> getTagLst() {
-        return graph.rightSet();
-    }
-
-    public World80 moveSymbol(String symbol, int x, int y) {
-        Preconditions.checkNotNull(symbol);
-        coord.forcePut(symbol, new Pair(x,y));
-        return this;
-    }
-
-    public World80 addTag(String symbol, Tag80 tag) {
-        Preconditions.checkNotNull(symbol,tag);
-        graph.link(symbol, tag);
-        return this;
-    }
-
-    public World80 removeTag(String symbol, Tag80 tag) {
-        Preconditions.checkNotNull(symbol,tag);
-        graph.unlink(symbol, tag);
-        return this;
-    }
-
-    public World80 addSymbol(String symbol, int x, int y) {
-        Preconditions.checkNotNull(symbol);
-        coord.forcePut(symbol, new Pair(x,y));
-        return this;
-    }
-
-    public World80 removeSymbol(String symbol) {
-        Preconditions.checkNotNull(symbol);
-        coord.remove(symbol);
-        graph.removeLeft(symbol);
-        return this;
-    }
-
-    @Override
-    public Pair getPairDefault() {
-        return new Pair(null,null);
-    }
-
-    @Override
-    public String getSymbolDefault() {
-        return "";
-    }
-
-    @Override
-    public Tag80 getTagDefault() {
-        return Tag80.nothing;
-    }
-
-    @Override
-    public Tile80 getTileDefault() {
+    public Tile80 getDefaultTile() {
         return Tile80.nothing;
     }
 
     private final Function<String,Tile80> toTile80 = new Function<String, Tile80>() {
         @Override
         public Tile80 apply(String input) {
-            return Tile80.from(coord.get(input), input, graph.neighborLeft(input));
+            return Tile80.fromWorld(input, World80Graph.this);
         }
     };
     
     @Override
     public Iterable<Tile80> getTileLst() {
-        return FluentIterable.from(getSymbolLst()).transform(toTile80);
+        return FluentIterable.from(coord.keySet()).transform(toTile80);
     }
 
     @Override
-    public Tile80 getTileByCoord(Pair pos) {
-        String symbol = getSymbolByCoord(pos);
-        return Tile80.from(pos, symbol, getTagBySymbol(symbol));
+    public Tile80 getTileByPos(Pair pos) {
+        String id = coord.inverse().get(pos);
+        return Tile80.from(pos, id, getTagById(id));
     }
 
     @Override
-    public Tile80 getTileBySymbol(String Symbol) {
-        return Tile80.from(getCoordBySymbol(Symbol), Symbol, getTagBySymbol(Symbol));
+    public Tile80 getTileById(String symbol) {
+        return Tile80.from(coord.get(this), symbol, getTagById(symbol));
     }
 
     @Override
     public Iterable<Tile80> getTileByTag(Tag80 tag) {
-        Iterable<String> symbolLst = getSymbolLstByTag(tag);
-        return FluentIterable.from(getSymbolLst()).transform(toTile80);
+        return FluentIterable.from(graph.neighborRight(tag)).transform(toTile80);
+    }
+
+    @Override
+    public Iterable<Tile80> getTileByRect(Pair<Integer, Integer> topLeft, Pair<Integer, Integer> bottomRight) {
+        Preconditions.checkNotNull(topLeft,bottomRight);
+        return FluentIterable.from(coord.values())
+                             .filter(Range.closed(topLeft,bottomRight))
+                             .transform(Functions.forMap(coord.inverse()))
+                             .transform(toTile80);
     }
     
+    /**
+     * 
+     * @param <S>
+     * @param <T> 
+     */
+    public static class Builder{
+        private final ImmutableGraph.Builder<String,Tag80> graph;
+        private final ImmutableBiMap.Builder<String,Pair<Integer,Integer>> coord;
+
+        public Builder() {
+            graph = ImmutableGraph.builder();
+            coord = ImmutableBiMap.builder();
+        }
+        
+        public World80Graph build(){
+            return new World80Graph(graph.build(), coord.build());
+        }
+
+        public Builder addTile(Tile80 tile){
+            coord.put(tile.getId(), tile.getPos());
+            for (Tag80 tag : tile.getTags())
+                graph.link(tile.getId(), tag);
+            return this;
+        }
+        
+        public Builder addTag(String symbol, Tag80 tag) {
+            graph.link(symbol, tag);
+            return this;
+        }
+
+        public Builder addSymbol(String symbol, int x, int y) {
+            coord.put(symbol, new Pair(x,y));
+            return this;
+        }
+    }
+ 
 }

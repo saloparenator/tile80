@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-import org.javatuples.Pair;
-import static org.junit.Assert.assertEquals;
+import com.google.common.collect.ImmutableSet;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import tile80.Tag80;
+import tile80.Tile80;
 import tile80.World80;
-import tile80.World80Immutable;
+import tile80.World80Graph;
 
 /**
  *
@@ -27,43 +29,117 @@ import tile80.World80Immutable;
  */
 public class testTile80 {
     World80 tileWorld;
-    
+    Tile80 player,
+           blockUnder,
+           blockOver,
+           blockintheair,
+           blockWall;
+
+        
     @Before
     public void setUp() {
-        tileWorld = World80Immutable.builder()
-                                    .addSymbol("player", 20, 20)
-                                    .addSymbol("blockUnder", 20, 21)
-                                    .addSymbol("blockOver", 20, 19)
-                                    .addSymbol("blockintheair", 15, 15)
-                                    .addSymbol("blockWall", 22, 20)
-                                    .build();
+        player=Tile80.from(20,20,"player",ImmutableSet.of(un,deux));
+        blockUnder=Tile80.from(20,21,"blockUnder",ImmutableSet.of(trois));
+        blockOver=Tile80.from(20,19,"blockOver",ImmutableSet.of(trois));
+        blockintheair=Tile80.from(15,15,"blockintheair",ImmutableSet.of(trois));
+        blockWall=Tile80.from(22,20,"blockWall",ImmutableSet.of(deux,trois));
+        tileWorld = World80Graph.builder()
+                                .addTile(player)
+                                .addTile(blockUnder)
+                                .addTile(blockOver)
+                                .addTile(blockintheair)
+                                .addTile(blockWall)
+                                .build();
     }
-   
-    @Test
-    public void findBlockUnderPlayer(){
-        Pair<Integer,Integer> pos = tileWorld.getCoordBySymbol("player"),
-                              under = new Pair(pos.getValue0(),pos.getValue1()+1);
-        String blockUnder = tileWorld.getSymbolByCoord(under);
-        assertEquals("blockUnder",blockUnder);
+
+    public void t(){
+        tileWorld.getTagById(null);
+        tileWorld.getTileByPos(null);
+        tileWorld.getTileByRect(null, null);
+        tileWorld.getTileById(null);
+        tileWorld.getTileByTag(Tag80.nothing);
+        tileWorld.getTileLst();
     }
     
-//    @Test
-//    public void movePlayerThenCheckBlockUnder(){
-//        tileWorld.moveSymbol("player", 21, 20);
-//        Pair<Integer,Integer> pos = tileWorld.getCoordBySymbol("player"),
-//                              under = new Pair(pos.getValue0(),pos.getValue1()+1);
-//        String blockUnder = tileWorld.getSymbolByCoord(under);
-//        assertEquals("",blockUnder);
-//    }
-    //player on a tile
+    @Test
+    public void testGetPosById(){
+        Assert.assertEquals(player.getPos(),tileWorld.getPosById("player"));
+    }
+    
+    @Test
+    public void testGetPosByIdNonExist(){
+        Assert.assertEquals(Tile80.nothing.getPos(),tileWorld.getPosById("kamina"));
+    }
+    
+    @Test
+    public void testGetPosByIdEmpty(){
+        Assert.assertEquals(Tile80.nothing.getPos(),tileWorld.getPosById(""));
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testGetPosByIdNull(){
+        tileWorld.getPosById(null);
+    }
+    
+    /*________________________________________________________________________*/
+    /*________________________________________________________________________*/
+    /*________________________________________________________________________*/
+    /*________________________________________________________________________*/
+    /*________________________________________________________________________*/
+    /*________________________________________________________________________*/
+    
+    Tag80 un = new Tag80(){
 
-    //symbol who search by tag
-    //symbol who search by coordinate
-    //symbol who search by range
-    //symbol who search a specific symbol
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
-    // @Test
-    // public void hello() {}
+        @Override
+        public String getName() {
+            return "";
+        }
+
+        @Override
+        public String getDescription() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public Tile80 crunch(Tile80 self, World80 world) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+           
+    };
+    Tag80 deux = new Tag80(){
+
+        @Override
+        public String getName() {
+            return "";
+        }
+
+        @Override
+        public String getDescription() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public Tile80 crunch(Tile80 self, World80 world) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    };
+    Tag80 trois = new Tag80(){
+
+        @Override
+        public String getName() {
+            return "";
+        }
+
+        @Override
+        public String getDescription() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public Tile80 crunch(Tile80 self, World80 world) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+    };
+    
 }

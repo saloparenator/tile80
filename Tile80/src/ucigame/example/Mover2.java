@@ -23,8 +23,9 @@ import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import tile80.Console80;
 import tile80.Tag80;
+import tile80.Tile80;
 import tile80.World80;
-import tile80.World80Immutable;
+import tile80.World80Graph;
 import tool.Json;
 import tool.Yield;
 import ucigame.Ucigame;
@@ -43,8 +44,9 @@ public class Mover2 extends Ucigame{
     Console80 console;
     World80 world;
     Set<String> event;
+    int i;
     
-    Tag80<Triplet> player = new Tag80<Triplet>(){
+    Tag80 player = new Tag80(){
         @Override
         public String getName() {
             return "player";
@@ -56,29 +58,20 @@ public class Mover2 extends Ucigame{
         }
 
         @Override
-        public Triplet crunch(Triplet self, World80 world) {
-            int x=0,y=0;
+        public Tile80 crunch(Tile80 self, World80 world) {
+            Tile80 crunching = self;
             for (String e : event){
                 if ("up".equals(e))
-                    y--;
+                    crunching = crunching.movePos(0, -1);
                 else if ("down".equals(e))
-                    y++;
+                    crunching = crunching.movePos(0, 1);
                 else if ("left".equals(e))
-                    x--;
+                    crunching = crunching.movePos(-1, 0);
                 else if ("right".equals(e))
-                    x++;
+                    crunching = crunching.movePos(1, 0);
             }
-            Pair<Integer,Integer> tmp = (Pair<Integer,Integer>) self.getValue(2);
-            return new Triplet(self.getValue(0), 
-                               self.getValue(1), 
-                               new Pair(tmp.getValue0()+x,
-                                        tmp.getValue1()+y));
-        }
-
-        @Override
-        public Iterable<Triplet> spawn(Triplet self, World80 world) {
-            return Yield.empty;
-        }          
+            return crunching;
+        }     
     };
     
     @Override
@@ -97,34 +90,32 @@ public class Mover2 extends Ucigame{
         mapInterface = Sprite80UciGame.makeSpriteFactoryUciGame(this, Json.loadFileJson("data/cursor.json"));
         console = new Console80UciGame(this, "Monospaced", 8, 255, 255, 255, 200);
         
-        world = World80Immutable.builder()
+        world = World80Graph.builder()
                                .addSymbol("player", 30, 30)
                                .addTag("player", player)
                                .build();
         event = new HashSet();
+        
+        i=0;
     }
 
     @Override
     public void draw()
     {
-        World80Immutable.Builder b = World80Immutable.builder();
-        Triplet t = new Triplet(null,null,null);
-        for(Tag80<Triplet> tag : world.getTagBySymbol("player")){
-            t = new Triplet("player",
-                            tag,
-                            world.getCoordBySymbol("player"));
-            t = tag.crunch(t, world);
+        World80Graph.Builder b = World80Graph.builder();
+        for(Tile80 tile : world.getTileLst()){
+            Tile80 t = tile;
+            for (Tag80 tag : tile.getTags())
+                t = tag.crunch(t, world);
+            b.addTile(t);
         }
-        Pair<Integer,Integer> nupos = (Pair)t.getValue2();
-        b.addSymbol("player", nupos.getValue0(), nupos.getValue1());
-        b.addTag("player", player);
         world = b.build();
         event.clear();
-        
+        console.addMessage("frame "+(i++));
         canvas.clear();
-        Pair<Integer,Integer> pos = world.getCoordBySymbol("player");
+        Pair<Integer,Integer> pos = world.getPosById("player");
         mapAstroSprite.get("astroWalk").makeSprite(pos.getValue0(), pos.getValue1()).draw();
-        
+ 
         console.draw(0, 8, 3);
     }
 

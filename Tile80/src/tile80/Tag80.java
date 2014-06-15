@@ -22,11 +22,10 @@ import org.javatuples.Tuple;
  *
  * @author martin
  */
-public abstract class Tag80<T> {
+public abstract class Tag80 {
     public abstract String getName();
     public abstract String getDescription();
-    public abstract T crunch(T self, World80 world);
-    public abstract Iterable<T> spawn(T self,World80 world);
+    public abstract Tile80 crunch(Tile80 self, World80 world);
     
     @Override
     public String toString(){
@@ -53,12 +52,7 @@ public abstract class Tag80<T> {
         }
 
         @Override
-        public Object crunch(Object self, World80 world) {
-            throw new UnsupportedOperationException("nothing to support, its nothing");
-        }
-
-        @Override
-        public Iterable<Object> spawn(Object self,  World80 world) {
+        public Tile80 crunch(Tile80 self, World80 world) {
             throw new UnsupportedOperationException("nothing to support, its nothing");
         }
     };

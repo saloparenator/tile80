@@ -41,180 +41,107 @@ import tool.PredicatesOnList;
  * @author martin
  */
 public class World80HOF implements World80 {
-    private Set<Tile80> world;
-    public World80HOF(){
-        world = new HashSet<>();
-    }
-    
-
-    @Override
-    public Iterable<String> getSymbolLst(){
-        return Iterables.transform(world, onlySymbol);
-    }
-    @Override
-    public Iterable<String> getSymbolNeighbor(String symbol){
-        Preconditions.checkNotNull(symbol);
-        Pair<Integer,Integer> center = getCoordBySymbol(symbol);
-        Predicate inRect = Range.closed(new Pair(center.getValue0()-1,center.getValue1()-1), 
-                                        new Pair(center.getValue0()+1,center.getValue1()+1));
-        return FluentIterable.from(world)
-                             .filter(Predicates.compose(inRect,onlyCoord))
-                             .transform(onlySymbol);
-        //return Iterables.transform(Iterables.filter(world, Predicates.compose(Range.closed(new Pair(center.getValue0()-1,center.getValue1()-1), new Pair(center.getValue0()+1,center.getValue1()+1)), onlyCoord)), onlySymbol);
-    }
- 
-    @Override
-    public Iterable<String> getSymbolLstByTag(Tag80 tag){
-        Preconditions.checkNotNull(tag);
-        return FluentIterable.from(world)
-                             .filter(Predicates.compose(PredicatesOnList.contains(tag), onlyTag))
-                             .transform(onlySymbol);
-        //return Iterables.transform(Iterables.filter(world, Predicates.compose(PredicatesOnList.contains(tag), onlyTag)),onlySymbol);
+    private final ImmutableSet<Tile80> world;
+    private World80HOF(ImmutableSet<Tile80> world){
+        this.world = world;
     }
 
     @Override
-    public String getSymbolByCoord(Pair coord){
-        Preconditions.checkNotNull(coord);
-        return FluentIterable.from(world)
-                             .filter(Predicates.compose(Predicates.equalTo(coord), onlyCoord))
-                             .first()
-                             .or(Tile80.nothing)
-                             .getId();
-        //return Iterables.getFirst(Iterables.filter(world, Predicates.compose(Predicates.equalTo(coord), onlyCoord)),TileDefault).getSymbol();
-    }
-    @Override
-    public Iterable<String> getSymbolByRect(Pair topLeft, Pair bottomRight){
-        Preconditions.checkNotNull(topLeft,bottomRight);
-        return FluentIterable.from(world)
-                             .filter(Predicates.compose(Range.closed(topLeft, bottomRight),onlyCoord))
-                             .transform(onlySymbol);
-        //return Iterables.transform(Iterables.filter(world, Predicates.compose(Range.closed(topLeft, bottomRight), onlyCoord)), onlySymbol);
-    }
-    @Override
-    public Iterable<Tag80> getTagLst(){
-        return Sets.newHashSet(FluentIterable.from(world)
-                                             .transformAndConcat(onlyTag));
-        //return Sets.newHashSet(Iterables.concat(Iterables.transform(world, onlyTag)));
-    }
-    @Override
-    public Iterable<Tag80> getTagBySymbol(String symbol){
-        Preconditions.checkNotNull(symbol);
-        return FluentIterable.from(world)
-                             .filter(Predicates.compose(Predicates.equalTo(symbol), onlySymbol))
-                             .first()
-                             .or(Tile80.nothing)
-                             .getTags();
-        //return Iterables.getFirst(Iterables.filter(world, Predicates.compose(Predicates.equalTo(symbol), onlySymbol)),TileDefault).getTag();
-    }
-    @Override
-    public Iterable<Pair> getCoordLst(){
-        return Iterables.transform(world, onlyCoord);
-    }
-    @Override
-    public Pair getCoordBySymbol(String symbol){
-        Preconditions.checkNotNull(symbol);
-        return FluentIterable.from(world)
-                             .filter(Predicates.compose(Predicates.equalTo(symbol), onlySymbol))
-                             .first()
-                             .or(Tile80.nothing)
-                             .getPos();
-        //return Iterables.getFirst(Iterables.filter(world, Predicates.compose(Predicates.equalTo(symbol), onlySymbol)), TileDefault).getCoord();
-    }
-
-    public World80 addTag(String symbol, Tag80 tag){
-        Preconditions.checkNotNull(symbol,tag);
-        Tile80 old = getTileBySymbol(symbol);
-        world.remove(old);
-        world.add(old.addTag(tag));
-        return this;
-    }
-
-    public World80 removeTag(String symbol, Tag80 tag){
-        Preconditions.checkNotNull(symbol,tag);
-        Tile80 old = getTileBySymbol(symbol);
-        world.remove(old);
-        world.add(old.removeTag(tag));
-        return this;
-    }
-
-    public World80 addSymbol(String symbol, int x, int y) {
-        Preconditions.checkNotNull(symbol);
-        if (Iterables.contains(getSymbolLst(),symbol))
-                return this;
-        List<Tag80> taglst = ImmutableList.of();
-        world.add(Tile80.from(new Pair(x,y), symbol, taglst));
-        return this;
-    }
-
-    public World80 removeSymbol(String symbol) {
-        Preconditions.checkNotNull(symbol);
-        world.remove(getTileBySymbol(symbol));
-        return this;
-    }
-    
-    /**
-     * inner object used for storage
-     */
-
-    @Override
-    public Pair getPairDefault() {
-        return new Pair(null,null);
+    public Pair getDefaultPos() {
+        return new Pair(0,0);
     }
 
     @Override
-    public String getSymbolDefault() {
+    public String getDefaultId() {
         return "";
     }
 
     @Override
-    public Tag80 getTagDefault() {
+    public Tag80 getDefaultTags() {
         return Tag80.nothing;
     }
 
     @Override
-    public Tile80 getTileDefault() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Tile80 getDefaultTile() {
+        return Tile80.nothing;
     }
 
     @Override
     public Iterable<Tile80> getTileLst() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return world;
     }
-
-    @Override
-    public Tile80 getTileByCoord(Pair pos) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Tile80 getTileBySymbol(String Symbol) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Iterable<Tile80> getTileByTag(Tag80 tag) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    /* FUNCTOR */
-    private static final Function<Tile80,Iterable<Tag80>> onlyTag = new Function<Tile80,Iterable<Tag80>>(){
+    
+    private final static Function<Tile80,Pair<Integer,Integer>> onlyCoord = new Function<Tile80, Pair<Integer, Integer>>() {
         @Override
-        public Iterable<Tag80> apply(Tile80 input) {
-            return input.getTags();
+        public Pair<Integer, Integer> apply(Tile80 input) {
+            return input.getPos();
         }
     };
 
-    private static final Function<Tile80,String> onlySymbol = new Function<Tile80,String>(){
+    @Override
+    public Tile80 getTileByPos(Pair pos) {
+        return FluentIterable.from(world)
+                             .filter(Predicates.compose(Predicates.equalTo(pos), onlyCoord))
+                             .first()
+                             .or(Tile80.nothing);
+    }
+
+    private final static Function<Tile80,String> onlyId = new Function<Tile80, String>() {
         @Override
         public String apply(Tile80 input) {
             return input.getId();
         }
     };
+    
+    @Override
+    public Tile80 getTileById(String Symbol) {
+        return FluentIterable.from(world)
+                             .filter(Predicates.compose(Predicates.equalTo(Symbol), onlyId))
+                             .first()
+                             .or(Tile80.nothing);    }
 
-    private static final Function<Tile80, Pair> onlyCoord = new Function<Tile80, Pair>() {
+    private static final Function<Tile80,Iterable<Tag80>> onlyTag = new Function<Tile80,Iterable<Tag80>>(){
         @Override
-        public Pair apply(Tile80 input) {
-            return input.getPos();
-        }
+        public Iterable<Tag80> apply(Tile80 input) {
+            return input.getTags();
+        }   
     };
+    
+    @Override
+    public Iterable<Tile80> getTileByTag(Tag80 tag) {
+        return FluentIterable.from(world)
+                             .filter(Predicates.compose(PredicatesOnList.contains(tag),onlyTag));          
+    }
+
+    @Override
+    public Iterable<Tile80> getTileByRect(Pair<Integer, Integer> topLeft, Pair<Integer, Integer> bottomRight) {
+        return FluentIterable.from(world)
+                             .filter(Predicates.compose(Range.closed(topLeft, bottomRight), onlyCoord));
+    }
+
+    @Override
+    public Pair<Integer, Integer> getPosById(String id) {
+        return getTileById(id).getPos();
+    }
+
+    @Override
+    public Iterable<Tag80> getTagById(String id) {
+        return getTileById(id).getTags();
+    }
+
+    public static class Builder{
+        private final ImmutableSet.Builder<Tile80> world;
+        public Builder(){
+            world = ImmutableSet.builder();
+        }
+        
+        public Builder addTile(Tile80 tile){
+            world.add(tile);
+            return this;
+        }
+
+        public World80 build(){
+            return new World80HOF(world.build());
+        }
+    }
 }

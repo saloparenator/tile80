@@ -25,77 +25,18 @@ import org.javatuples.Pair;
  */
 public interface World80 {
 
-    Pair getPairDefault();
-    String getSymbolDefault();
-    Tag80 getTagDefault();
-    Tile80 getTileDefault();
+    Pair getDefaultPos();
+    String getDefaultId();
+    Tag80 getDefaultTags();
+    Tile80 getDefaultTile();
     
     Iterable<Tile80> getTileLst();
-    Tile80 getTileByCoord(Pair pos);
-    Tile80 getTileBySymbol(String Symbol);
+    Tile80 getTileByPos(Pair pos);
+    Tile80 getTileById(String Symbol);
     Iterable<Tile80> getTileByTag(Tag80 tag);
-
-    /**
-     * all coordinate occupied in the world
-     * @return
-     */
-    Iterable<Pair> getCoordLst();
-    /**
-     * get all tag that exist in this world
-     * @return
-     */
-    Iterable<Tag80> getTagLst();
-      /**
-     * all symbol in the world
-     * @return
-     */
-    Iterable<String> getSymbolLst();  
+    Iterable<Tile80> getTileByRect(Pair<Integer,Integer> topLeft,
+                                   Pair<Integer,Integer> bottomRight);
     
-    /**
-     * return the coordinate were the symbol is located
-     * @param symbol
-     * @return
-     */
-    Pair getCoordBySymbol(String symbol);
-    
-    /**
-     * get all tag that the given symbol contain
-     * @param symbol
-     * @return
-     */
-    Iterable<Tag80> getTagBySymbol(String symbol);
-
-    /**
-     * get symbol by coordinate (many can overlap)
-     * @param coord
-     * @return
-     */
-    String getSymbolByCoord(Pair pos);
-
-    /**
-     * get all symbol were coordinate is between topleft and bottomright
-     * @param topLeft
-     * @param bottomRight
-     * @return
-     */
-    Iterable<String> getSymbolByRect(Pair topLeft, Pair bottomRight);
-
-    /**
-     * all symbol containing this tag
-     * @param tag
-     * @return
-     */
-    Iterable<String> getSymbolLstByTag(Tag80 tag);
-
-    /**
-     * all symbol adjacent to given one
-     * @param symbol
-     * @return
-     */
-    Iterable<String> getSymbolNeighbor(String symbol);
-
-
-
-
-
+    Pair<Integer,Integer> getPosById(String id);
+    Iterable<Tag80> getTagById(String id);
 }

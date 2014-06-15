@@ -20,7 +20,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import java.util.Collection;
+import java.util.Set;
 import org.javatuples.Pair;
 
 /**
@@ -28,149 +28,20 @@ import org.javatuples.Pair;
  * @author martin
  */
 public abstract class Tile80 {
-    public static Tile80 nothing = new Tile80(){
-        @Override
-        public Pair<Integer, Integer> getPos() {
-            throw new UnsupportedOperationException("Nothing");
-        }
-
-        @Override
-        public int getX() {
-            throw new UnsupportedOperationException("Nothing");
-        }
-
-        @Override
-        public int getY() {
-            throw new UnsupportedOperationException("Nothing");
-        }
-
-        @Override
-        public String getId() {
-            return "";
-        }
-
-        @Override
-        public Iterable<Tag80> getTags() {
-            return ImmutableSet.of();
-        }
-
-        @Override
-        public Tile80 movePos(int x, int y) {
-            return this;
-        }
-
-        @Override
-        public Tile80 movePos(Pair<Integer,Integer> pos) {
-            return this;
-        }
-
-        @Override
-        public Tile80 setPos(int x, int y) {
-            return this;
-        }
-
-        @Override
-        public Tile80 setPos(Pair<Integer,Integer> pos) {
-            return this;
-        }
-
-        @Override
-        public Tile80 addTag(Tag80 tag) {
-            return this;
-        }
-
-        @Override
-        public Tile80 removeTag(Tag80 tag) {
-            return this;
-        }
-        
-    };
             
     public static Tile80 from(Pair<Integer, Integer> pos, String id, Iterable<Tag80> tagLst){
         return new byValue(pos, id, tagLst);
     }
-    private static class byValue extends Tile80{
-        private final Pair<Integer,Integer> pos;
-        private final String id;
-        private final Iterable<Tag80> tagLst;
-
-        public byValue(Pair<Integer, Integer> pos, String id, Iterable<Tag80> tagLst) {
-            this.pos = pos;
-            this.id = id;
-            this.tagLst = tagLst;
-        }
-        @Override
-        public Pair<Integer, Integer> getPos() {
-            return pos;
-        }
-
-        @Override
-        public int getX() {
-            return pos.getValue0();
-        }
-
-        @Override
-        public int getY() {
-            return pos.getValue1();
-        }
-
-        @Override
-        public String getId() {
-            return id;
-        }
-
-        @Override
-        public Iterable<Tag80> getTags() {
-            return tagLst;
-        }
-
-        @Override
-        public Tile80 movePos(int x, int y) {
-            return new byValue(new Pair(getX()+x,getY()+y),
-                               getId(),
-                               getTags());
-        }
-
-        @Override
-        public Tile80 movePos(Pair<Integer,Integer> rpos) {
-            return new byValue(new Pair(getX()+rpos.getValue0(),
-                                        getY()+rpos.getValue1()),
-                               getId(),
-                               getTags());
-        }
-
-        @Override
-        public Tile80 setPos(int x, int y) {
-            return new byValue(new Pair(x,y),
-                               getId(),
-                               getTags());
-        }
-
-        @Override
-        public Tile80 setPos(Pair<Integer,Integer> npos) {
-            return new byValue(npos,
-                               getId(),
-                               getTags());
-        }
-
-        @Override
-        public Tile80 addTag(Tag80 tag) {
-            return new byValue(getPos(),
-                               getId(),
-                               Iterables.concat(ImmutableSet.of(tag),getTags()));    
-        }
-
-        @Override
-        public Tile80 removeTag(Tag80 tag) {
-            return new byValue(getPos(),
-                               getId(),
-                               FluentIterable.from(getTags())
-                                             .filter(Predicates.not(Predicates.equalTo(tag))));    
-        }
-        
-    };     
-          
-            
+    public static Tile80 from(int x, int y, String id, Iterable<Tag80> tagLst){
+        return new byValue(new Pair(x,y), id, tagLst);
+    }
+    public static Tile80 fromWorld(String id, World80 world){
+        return new lazy(world, id);
+    }
+    public static Tile80 newEmpty(String id){
+        Set<Tag80> tags = ImmutableSet.of();
+        return new byValue(new Pair(0,0),id,tags);
+    }
     /**
      * getter
      * return the position Pair
@@ -268,4 +139,225 @@ public abstract class Tile80 {
         }
         return false;
     }
+    
+   public static Tile80 nothing = new Tile80(){
+        @Override
+        public Pair<Integer, Integer> getPos() {
+            return new Pair(null,null);
+        }
+
+        @Override
+        public int getX() {
+            return 0;
+        }
+
+        @Override
+        public int getY() {
+            return 0;
+        }
+
+        @Override
+        public String getId() {
+            return "";
+        }
+
+        @Override
+        public Iterable<Tag80> getTags() {
+            return ImmutableSet.of();
+        }
+
+        @Override
+        public Tile80 movePos(int x, int y) {
+            return this;
+        }
+
+        @Override
+        public Tile80 movePos(Pair<Integer,Integer> pos) {
+            return this;
+        }
+
+        @Override
+        public Tile80 setPos(int x, int y) {
+            return this;
+        }
+
+        @Override
+        public Tile80 setPos(Pair<Integer,Integer> pos) {
+            return this;
+        }
+
+        @Override
+        public Tile80 addTag(Tag80 tag) {
+            return this;
+        }
+
+        @Override
+        public Tile80 removeTag(Tag80 tag) {
+            return this;
+        }
+        
+    };
+   
+    private static class byValue extends Tile80{
+        private final Pair<Integer,Integer> pos;
+        private final String id;
+        private final Iterable<Tag80> tagLst;
+
+        public byValue(Pair<Integer, Integer> pos, String id, Iterable<Tag80> tagLst) {
+            this.pos = pos;
+            this.id = id;
+            this.tagLst = tagLst;
+        }
+        @Override
+        public Pair<Integer, Integer> getPos() {
+            return pos;
+        }
+
+        @Override
+        public int getX() {
+            return pos.getValue0();
+        }
+
+        @Override
+        public int getY() {
+            return pos.getValue1();
+        }
+
+        @Override
+        public String getId() {
+            return id;
+        }
+
+        @Override
+        public Iterable<Tag80> getTags() {
+            return tagLst;
+        }
+
+        @Override
+        public Tile80 movePos(int x, int y) {
+            return new byValue(new Pair(getX()+x,getY()+y),
+                               getId(),
+                               getTags());
+        }
+
+        @Override
+        public Tile80 movePos(Pair<Integer,Integer> rpos) {
+            return new byValue(new Pair(getX()+rpos.getValue0(),
+                                        getY()+rpos.getValue1()),
+                               getId(),
+                               getTags());
+        }
+
+        @Override
+        public Tile80 setPos(int x, int y) {
+            return new byValue(new Pair(x,y),
+                               getId(),
+                               getTags());
+        }
+
+        @Override
+        public Tile80 setPos(Pair<Integer,Integer> npos) {
+            return new byValue(npos,
+                               getId(),
+                               getTags());
+        }
+
+        @Override
+        public Tile80 addTag(Tag80 tag) {
+            return new byValue(getPos(),
+                               getId(),
+                               Iterables.concat(ImmutableSet.of(tag),getTags()));    
+        }
+
+        @Override
+        public Tile80 removeTag(Tag80 tag) {
+            return new byValue(getPos(),
+                               getId(),
+                               FluentIterable.from(getTags())
+                                             .filter(Predicates.not(Predicates.equalTo(tag))));    
+        }
+    };
+    
+    private static class lazy extends Tile80{
+        private final World80 world;
+        private final String id;
+        private Pair<Integer,Integer> pos;
+        private Iterable<Tag80> tags;
+
+        public lazy(World80 world, String id) {
+            this.world = world;
+            this.id = id;
+            pos=null;
+            tags=null;
+        }
+
+        @Override
+        public Pair<Integer, Integer> getPos() {
+            if (pos==null)
+                pos=world.getPosById(id);
+            return pos;
+        }
+
+        @Override
+        public int getX() {
+            if (pos==null)
+                pos=world.getPosById(id);
+            return pos.getValue0();
+        }
+
+        @Override
+        public int getY() {
+            if (pos==null)
+                pos=world.getPosById(id);   
+            return pos.getValue1();
+        }
+
+        @Override
+        public String getId() {
+            return id;
+        }
+
+        @Override
+        public Iterable<Tag80> getTags() {
+            if (tags==null)
+                tags=world.getTagById(id);
+            return tags;
+        }
+
+        @Override
+        public Tile80 movePos(int x, int y) {
+            return Tile80.from(new Pair(getX()+x,getY()+y), getId(), getTags());
+        }
+
+        @Override
+        public Tile80 movePos(Pair<Integer, Integer> pos) {
+            return Tile80.from(new Pair(getX()+pos.getValue0(),getY()+pos.getValue1()), getId(), getTags());
+        }
+
+        @Override
+        public Tile80 setPos(int x, int y) {
+            return Tile80.from(new Pair(x,y), getId(), getTags());
+        }
+
+        @Override
+        public Tile80 setPos(Pair<Integer, Integer> pos) {
+            return Tile80.from(pos, getId(), getTags());
+        }
+
+        @Override
+        public Tile80 addTag(Tag80 tag) {
+            return new byValue(getPos(),
+                               getId(),
+                               Iterables.concat(ImmutableSet.of(tag),getTags()));    
+        }
+
+        @Override
+        public Tile80 removeTag(Tag80 tag) {
+            return new byValue(getPos(),
+                               getId(),
+                               FluentIterable.from(getTags())
+                                             .filter(Predicates.not(Predicates.equalTo(tag))));    
+        }
+    };
+    
 }
