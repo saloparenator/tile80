@@ -113,6 +113,37 @@ public abstract class Tile80 {
      */
     public abstract Tile80 removeTag(Tag80 tag);
     
+    /**
+     * Self crunch with all tag it contains
+     * @param world
+     * @param event
+     * @return 
+     */
+    public Iterable<Tile80> crunch(World80 world, Set<String> event) {
+        ImmutableSet.Builder<Tile80> ret = ImmutableSet.builder();
+        Tile80 newTile = this;
+        for (Tag80 tag : getTags()){
+            Iterable<Tile80> tileLst = tag.crunch(newTile, world, event);
+            newTile = findSelf(tileLst);
+            for (Tile80 tile : FluentIterable.from(tileLst).filter(Predicates.not(Predicates.equalTo(newTile))))
+                ret.add(tile);
+            if (newTile.equals(nothing))
+                break;
+        }
+        return ret.add(newTile).build();
+    }    
+    /**
+     * 
+     * @param tileLst
+     * @return 
+     */
+    protected Tile80 findSelf(Iterable<Tile80> tileLst){
+        for (Tile80 tile : tileLst)
+            if (tile.getId().equals(getId()))
+                return tile;
+        return nothing;
+    }
+    
     @Override
     public int hashCode(){
         int h = 13 * getPos().hashCode();
@@ -143,7 +174,7 @@ public abstract class Tile80 {
    public static Tile80 nothing = new Tile80(){
         @Override
         public Pair<Integer, Integer> getPos() {
-            return new Pair(null,null);
+            return new Pair(0,0);
         }
 
         @Override
@@ -195,7 +226,12 @@ public abstract class Tile80 {
         public Tile80 removeTag(Tag80 tag) {
             return this;
         }
-        
+
+        @Override
+        public Iterable<Tile80> crunch(World80 world, Set<String> event) {
+            return ImmutableSet.of();
+        }
+       
     };
    
     private static class byValue extends Tile80{
@@ -276,6 +312,7 @@ public abstract class Tile80 {
                                FluentIterable.from(getTags())
                                              .filter(Predicates.not(Predicates.equalTo(tag))));    
         }
+
     };
     
     private static class lazy extends Tile80{
@@ -358,6 +395,7 @@ public abstract class Tile80 {
                                FluentIterable.from(getTags())
                                              .filter(Predicates.not(Predicates.equalTo(tag))));    
         }
+
     };
     
 }

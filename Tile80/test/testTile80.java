@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Range;
+import java.util.Set;
+import org.javatuples.Pair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +56,14 @@ public class testTile80 {
                                 .build();
     }
 
+    @Test
+    public void text(){
+        Predicate r = Range.closed(new Pair(2,2),new Pair(4,4));
+        for (int x=0;x<6;x++)
+            for(int y=0;y<6;y++)
+                System.out.println(x+","+y+" "+r.apply(new Pair(x,y)));
+    }
+    
     public void t(){
         tileWorld.getTagById(null);
         tileWorld.getTileByPos(null);
@@ -101,7 +113,7 @@ public class testTile80 {
         }
 
         @Override
-        public Tile80 crunch(Tile80 self, World80 world) {
+        public Iterable<Tile80> crunch(Tile80 self, World80 world,Set<String> event) {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
            
@@ -119,7 +131,7 @@ public class testTile80 {
         }
 
         @Override
-        public Tile80 crunch(Tile80 self, World80 world) {
+        public Iterable<Tile80> crunch(Tile80 self, World80 world,Set<String> event) {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     };
@@ -136,7 +148,7 @@ public class testTile80 {
         }
 
         @Override
-        public Tile80 crunch(Tile80 self, World80 world) {
+        public Iterable<Tile80> crunch(Tile80 self, World80 world,Set<String> event) {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
 

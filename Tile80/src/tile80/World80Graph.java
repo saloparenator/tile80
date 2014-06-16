@@ -20,11 +20,11 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
+import com.google.common.collect.BiMap;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.Range;
-import java.util.Collection;
 import java.util.Set;
 import org.javatuples.Pair;
 import tool.ImmutableGraph;
@@ -61,7 +61,7 @@ public class World80Graph implements World80{
 
     @Override
     public Pair getDefaultPos() {
-        return new Pair(null,null);
+        return getDefaultTile().getPos();
     }
     
     @Override
@@ -126,6 +126,16 @@ public class World80Graph implements World80{
                              .transform(Functions.forMap(coord.inverse()))
                              .transform(toTile80);
     }
+
+    @Override
+    public World80 crunch(Set<String> event) {
+        World80Graph.Builder nextFrame = World80Graph.builder();
+        for (Tile80 tile : getTileLst())
+            for (Tile80 ntile : tile.crunch(this, event))
+                nextFrame.addTile(ntile);
+        World80 w = nextFrame.build();
+        return w;
+    }
     
     /**
      * 
@@ -134,19 +144,19 @@ public class World80Graph implements World80{
      */
     public static class Builder{
         private final ImmutableGraph.Builder<String,Tag80> graph;
-        private final ImmutableBiMap.Builder<String,Pair<Integer,Integer>> coord;
+        private final BiMap<String,Pair<Integer,Integer>> coord;
 
         public Builder() {
             graph = ImmutableGraph.builder();
-            coord = ImmutableBiMap.builder();
+            coord = HashBiMap.create();
         }
         
         public World80Graph build(){
-            return new World80Graph(graph.build(), coord.build());
+            return new World80Graph(graph.build(), ImmutableBiMap.copyOf(coord));
         }
 
         public Builder addTile(Tile80 tile){
-            coord.put(tile.getId(), tile.getPos());
+            coord.forcePut(tile.getId(), tile.getPos());
             for (Tag80 tag : tile.getTags())
                 graph.link(tile.getId(), tag);
             return this;
@@ -158,7 +168,7 @@ public class World80Graph implements World80{
         }
 
         public Builder addSymbol(String symbol, int x, int y) {
-            coord.put(symbol, new Pair(x,y));
+            coord.forcePut(symbol, new Pair(x,y));
             return this;
         }
     }

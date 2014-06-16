@@ -16,16 +16,35 @@
 
 package tile80;
 
-import org.javatuples.Tuple;
+import com.google.common.collect.ImmutableSet;
+import java.util.Set;
 
 /**
  *
  * @author martin
  */
 public abstract class Tag80 {
+    public static Tag80 makeTag(String name, String description){
+        return new Tag(name,description);
+    }
+    /**
+     * return name
+     * @return 
+     */
     public abstract String getName();
+    /**
+     * return description
+     * @return 
+     */
     public abstract String getDescription();
-    public abstract Tile80 crunch(Tile80 self, World80 world);
+    /**
+     * modify the tile in a frame
+     * @param self
+     * @param world
+     * @param event
+     * @return 
+     */
+    public abstract Iterable<Tile80> crunch(Tile80 self, World80 world, Set<String> event);
     
     @Override
     public String toString(){
@@ -40,6 +59,32 @@ public abstract class Tag80 {
         return o==this;
     }
     
+    private static final class Tag extends Tag80{
+        private final String name;
+        private final String description;
+
+        private Tag(String name, String description) {
+            this.name = name;
+            this.description = description;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String getDescription() {
+            return description;
+        }
+
+        @Override
+        public Iterable<Tile80> crunch(Tile80 self, World80 world, Set<String> event) {
+            return ImmutableSet.of(self);
+        }
+        
+    }
+    
     public static final Tag80 nothing = new Tag80(){
         @Override
         public String getName() {
@@ -52,8 +97,8 @@ public abstract class Tag80 {
         }
 
         @Override
-        public Tile80 crunch(Tile80 self, World80 world) {
-            throw new UnsupportedOperationException("nothing to support, its nothing");
+        public Iterable<Tile80> crunch(Tile80 self, World80 world,Set<String> event) {
+            return ImmutableSet.of(self);
         }
     };
 }

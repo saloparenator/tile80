@@ -16,6 +16,7 @@
 
 package ucigame.example;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +59,7 @@ public class Mover2 extends Ucigame{
         }
 
         @Override
-        public Tile80 crunch(Tile80 self, World80 world) {
+        public Iterable<Tile80> crunch(Tile80 self, World80 world,Set<String> event) {
             Tile80 crunching = self;
             for (String e : event){
                 if ("up".equals(e))
@@ -70,7 +71,7 @@ public class Mover2 extends Ucigame{
                 else if ("right".equals(e))
                     crunching = crunching.movePos(1, 0);
             }
-            return crunching;
+            return ImmutableSet.of(crunching);
         }     
     };
     
@@ -91,9 +92,9 @@ public class Mover2 extends Ucigame{
         console = new Console80UciGame(this, "Monospaced", 8, 255, 255, 255, 200);
         
         world = World80Graph.builder()
-                               .addSymbol("player", 30, 30)
-                               .addTag("player", player)
-                               .build();
+                            .addSymbol("player", 30, 30)
+                            .addTag("player", player)
+                            .build();
         event = new HashSet();
         
         i=0;
@@ -102,14 +103,7 @@ public class Mover2 extends Ucigame{
     @Override
     public void draw()
     {
-        World80Graph.Builder b = World80Graph.builder();
-        for(Tile80 tile : world.getTileLst()){
-            Tile80 t = tile;
-            for (Tag80 tag : tile.getTags())
-                t = tag.crunch(t, world);
-            b.addTile(t);
-        }
-        world = b.build();
+        world = world.crunch(event);
         event.clear();
         console.addMessage("frame "+(i++));
         canvas.clear();

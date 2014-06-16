@@ -17,11 +17,8 @@
 package tool;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
-import java.util.Collection;
 import java.util.Set;
 
 /**

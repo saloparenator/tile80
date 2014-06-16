@@ -17,21 +17,10 @@
 package tile80;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
-import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import org.javatuples.Pair;
 import tool.PredicatesOnList;
@@ -48,7 +37,7 @@ public class World80HOF implements World80 {
 
     @Override
     public Pair getDefaultPos() {
-        return new Pair(0,0);
+        return getDefaultTile().getPos();
     }
 
     @Override
@@ -127,6 +116,15 @@ public class World80HOF implements World80 {
     @Override
     public Iterable<Tag80> getTagById(String id) {
         return getTileById(id).getTags();
+    }
+    
+    @Override
+    public World80 crunch(Set<String> event) {
+        World80HOF.Builder nextFrame = new World80HOF.Builder();
+        for (Tile80 tile : getTileLst())
+            for (Tile80 ntile : tile.crunch(this, event))
+                nextFrame.addTile(ntile);
+        return nextFrame.build();
     }
 
     public static class Builder{
