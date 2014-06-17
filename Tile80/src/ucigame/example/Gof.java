@@ -27,7 +27,7 @@ import ucigame.tile80.Console80UciGame;
  *
  * @author martin
  */
-public class GameOfLife extends Ucigame{
+public class Gof extends Ucigame{
     public static class Neighbor extends Yield<Pair>{
         private final Pair<Integer,Integer> center;
         int i;

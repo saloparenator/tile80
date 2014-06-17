@@ -7,6 +7,7 @@
 package ucigame.example;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
@@ -22,7 +23,6 @@ import tile80.Tag80;
 import tile80.Tile80;
 import tile80.World80;
 import tile80.World80Graph;
-import tile80.World80HOF;
 import tool.Json;
 import tool.Yield;
 import ucigame.Ucigame;
@@ -33,7 +33,7 @@ import ucigame.tile80.Sprite80UciGame;
  *
  * @author martin
  */
-public class GameOfLife2 extends Ucigame{
+public class Gof2 extends Ucigame{
    
     public static class Neighbor extends Yield<Pair<Integer,Integer>>{
         private final Pair<Integer,Integer> center;
@@ -55,12 +55,20 @@ public class GameOfLife2 extends Ucigame{
         }
         
     };
-    Function<Tile80,Pair<Integer,Integer>> onlyCoord = new Function<Tile80, Pair<Integer, Integer>>() {
+    static Function<Tile80,Pair<Integer,Integer>> onlyCoord = new Function<Tile80, Pair<Integer, Integer>>() {
         @Override
         public Pair<Integer, Integer> apply(Tile80 input) {
             return input.getPos();
         }
     };
+    
+    public static int countAliveNeighbor(Pair<Integer,Integer> pos, World80 world){
+        int n=0;
+        for (Pair around : new Neighbor(pos))
+            if(!Tile80.nothing.equals(world.getTileByPos(around)))
+                n++;
+        return n;   
+    }
     
     Tag80 alive = new Tag80(){
 
@@ -78,28 +86,16 @@ public class GameOfLife2 extends Ucigame{
         public Iterable<Tile80> crunch(Tile80 self, World80 world, Set<String> event) {
             ImmutableSet.Builder<Tile80> t = ImmutableSet.builder();
 
-            Pair topLeft = new Pair(self.getX()-1,
-                                    self.getY()-1),
-                 bottomRight = new Pair(self.getX()+1,
-                                        self.getY()+1);
-            
-            Set<Pair<Integer,Integer>> nei = FluentIterable.from(world.getTileByRect(topLeft, bottomRight))
-                                                           .transform(onlyCoord)
-                                                           .filter(Predicates.not(Predicates.equalTo(self.getPos())))
-                                                           .toSet();
-
-            int n = nei.size();
-            System.out.println(self.getPos().toString()+" "+n);
-            if(n==2 || n==3)
+            int n = countAliveNeighbor(self.getPos(),world);
+            if (n==3 || n==2)
                 t.add(self);
-
-            for(Pair<Integer,Integer> p : FluentIterable.from(new Neighbor(self.getPos())).filter(Predicates.not(Predicates.in(nei)))){
-                Pair<Integer,Integer> tl = new Pair(p.getValue0()-1,p.getValue1()-1),
-                                      br = new Pair(p.getValue0()+1,p.getValue1()+1);
-                    if (FluentIterable.from(world.getTileByRect(tl, br)).size()==3)
-                        t.add(Tile80.from(p, ""+p.hashCode(), ImmutableSet.of(alive)));
+            
+            for(Pair<Integer,Integer> pos : new Neighbor(self.getPos())){
+                if (countAliveNeighbor(pos,world)==3){
+                    t.add(Tile80.from(pos, ""+pos.hashCode(), ImmutableSet.of(alive)));
+                }
             }
-
+            
             return t.build();
         }
         
@@ -148,6 +144,7 @@ public class GameOfLife2 extends Ucigame{
         for (Pair<Integer,Integer> p : click){
             mapSprite.get("blueBlock1").makeSprite(p.getValue0(), p.getValue1()).draw();
         }
+        console.addMessage("size:"+Iterables.size(world.getTileLst()));
         console.draw(0, 8, 3);
         
         if(!pause){

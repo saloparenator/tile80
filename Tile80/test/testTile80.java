@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Range;
+import com.google.common.collect.Iterables;
 import java.util.Set;
 import org.javatuples.Pair;
 import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import tile80.Tag80;
@@ -55,22 +57,138 @@ public class testTile80 {
                                 .addTile(blockWall)
                                 .build();
     }
-
+    
     @Test
-    public void text(){
-        Predicate r = Range.closed(new Pair(2,2),new Pair(4,4));
-        for (int x=0;x<6;x++)
-            for(int y=0;y<6;y++)
-                System.out.println(x+","+y+" "+r.apply(new Pair(x,y)));
+    public void testGetTileByTagUn(){
+        assertTrue(Iterables.contains(tileWorld.getTileByTag(un),player));
     }
     
-    public void t(){
-        tileWorld.getTagById(null);
-        tileWorld.getTileByPos(null);
-        tileWorld.getTileByRect(null, null);
+    @Test
+    public void testGetTileByTagDeux(){
+        assertTrue(Iterables.contains(tileWorld.getTileByTag(deux),player));
+        assertTrue(Iterables.contains(tileWorld.getTileByTag(deux),blockWall));
+    }
+    
+    @Test
+    public void testGetTileByTagTrois(){
+        assertTrue(Iterables.contains(tileWorld.getTileByTag(trois),blockUnder));
+        assertTrue(Iterables.contains(tileWorld.getTileByTag(trois),blockOver));
+        assertTrue(Iterables.contains(tileWorld.getTileByTag(trois),blockintheair));
+        assertTrue(Iterables.contains(tileWorld.getTileByTag(trois),blockWall));
+    }
+    
+    @Test
+    public void testGetTileByTagNothing(){
+        assertEquals(0,Iterables.size(tileWorld.getTileByTag(quatre)));
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testGetTileByTagNull(){
+        assertTrue(Iterables.contains(tileWorld.getTileByTag(null),Tile80.nothing));
+    }
+    
+    @Test
+    public void testGetTileById(){
+        assertEquals(player,tileWorld.getTileById("player"));
+    }
+    
+    @Test
+    public void testGetTileByIdNothing(){
+        assertEquals(Tile80.nothing,tileWorld.getTileById("gurenlagann"));
+    }
+    
+    @Test
+    public void testGetTileByIdEmpty(){
+        assertEquals(Tile80.nothing,tileWorld.getTileById(""));
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testGetTileByIdNull(){
         tileWorld.getTileById(null);
-        tileWorld.getTileByTag(Tag80.nothing);
-        tileWorld.getTileLst();
+    }
+    
+    @Test
+    public void testGetTileByRect(){
+        Pair topLeft = new Pair(15,15);
+        Pair bottomRight = new Pair(25,25);
+        assertTrue(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), player));
+        assertTrue(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), blockUnder));
+        assertTrue(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), blockOver));
+        assertTrue(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), blockintheair));
+        assertTrue(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), blockWall));
+    }
+    
+    @Test
+    public void testGetTileByRectNothing(){
+        Pair topLeft = new Pair(25,25);
+        Pair bottomRight = new Pair(35,35);
+        assertFalse(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), player));
+        assertFalse(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), blockUnder));
+        assertFalse(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), blockOver));
+        assertFalse(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), blockintheair));
+        assertFalse(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), blockWall));
+        assertEquals(0,Iterables.size(tileWorld.getTileByRect(topLeft,bottomRight)));
+    }
+    
+    @Test
+    public void testGetTileByRectEmpty(){
+        Pair topLeft = new Pair(25,25);
+        Pair bottomRight = new Pair(25,25);
+        assertFalse(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), player));
+        assertFalse(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), blockUnder));
+        assertFalse(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), blockOver));
+        assertFalse(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), blockintheair));
+        assertFalse(Iterables.contains(tileWorld.getTileByRect(topLeft,bottomRight), blockWall));
+        assertEquals(0,Iterables.size(tileWorld.getTileByRect(topLeft,bottomRight)));
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testGetTileByRectNull(){
+        Pair topLeft = null;
+        Pair bottomRight = new Pair(35,35);
+        tileWorld.getTileByRect(topLeft,bottomRight);
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testGetTileByRectNull2(){
+        Pair topLeft = new Pair(25,25);
+        Pair bottomRight = null;
+        tileWorld.getTileByRect(topLeft,bottomRight);
+    }
+    
+    @Test
+    public void testGetTileByPos(){
+        assertEquals(player,tileWorld.getTileByPos(new Pair(20,20)));
+    }
+    
+    @Test
+    public void testGetTileByPosNonExist(){
+        assertEquals(Tile80.nothing,tileWorld.getTileByPos(new Pair(1000,1000)));
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testGetTileByPosNull(){
+        tileWorld.getTileByPos(null);
+    }
+    
+    @Test
+    public void testGetTagById(){
+        assertEquals(player.getTags(),tileWorld.getTagById("player"));
+    }
+    
+    @Test
+    public void testGetTagByIdNonExist(){
+        assertEquals(Tile80.nothing.getTags(),tileWorld.getTagById("trololo"));
+    }
+    
+    @Test
+    public void testGetTagByIdEmpty(){
+        assertEquals(Tile80.nothing.getTags(),tileWorld.getTagById(""));
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testGetTagByIdNull(){
+        tileWorld.getTagById(null);
     }
     
     @Test
@@ -91,6 +209,24 @@ public class testTile80 {
     @Test(expected = NullPointerException.class)
     public void testGetPosByIdNull(){
         tileWorld.getPosById(null);
+    }
+    
+    @Test
+    public void testAddTileDuplicateId(){
+        World80 test = World80Graph.builder()
+                                   .addTile(player)
+                                   .addTile(Tile80.from(1, 2, "player", ImmutableSet.of(un)))
+                                   .build();
+        assertEquals(1, Iterables.size(test.getTileLst()));
+    }
+    
+    @Test
+    public void testAddTileDuplicatePos(){
+        World80 test = World80Graph.builder()
+                                   .addTile(player)
+                                   .addTile(Tile80.from(20, 20, "id", ImmutableSet.of(un)))
+                                   .build();
+        assertEquals(1, Iterables.size(test.getTileLst()));
     }
     
     /*________________________________________________________________________*/
@@ -136,6 +272,24 @@ public class testTile80 {
         }
     };
     Tag80 trois = new Tag80(){
+
+        @Override
+        public String getName() {
+            return "";
+        }
+
+        @Override
+        public String getDescription() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public Iterable<Tile80> crunch(Tile80 self, World80 world,Set<String> event) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+    };
+    Tag80 quatre = new Tag80(){
 
         @Override
         public String getName() {
