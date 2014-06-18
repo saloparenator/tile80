@@ -10,6 +10,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import java.util.Collections;
@@ -19,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import org.javatuples.Pair;
 import tile80.Console80;
-import tile80.Tag80;
+import tile80.Behavior80;
 import tile80.Tile80;
 import tile80.World80;
 import tile80.World80Graph;
@@ -70,7 +71,7 @@ public class Gof2 extends Ucigame{
         return n;   
     }
     
-    Tag80 alive = new Tag80(){
+    Behavior80 alive = new Behavior80(){
 
         @Override
         public String getName() {
@@ -92,7 +93,11 @@ public class Gof2 extends Ucigame{
             
             for(Pair<Integer,Integer> pos : new Neighbor(self.getPos())){
                 if (countAliveNeighbor(pos,world)==3){
-                    t.add(Tile80.from(pos, ""+pos.hashCode(), ImmutableSet.of(alive)));
+                    t.add(Tile80.from(pos, 
+                                      ""+pos.hashCode(), 
+                                      ImmutableSet.of("gof"),
+                                      ImmutableSet.of(alive),
+                                      ImmutableMap.of("","")));
                 }
             }
             
@@ -122,11 +127,11 @@ public class Gof2 extends Ucigame{
         window.showFPS();
         mapSprite = Sprite80UciGame.makeSpriteFactoryUciGame(this,Json.loadFileJson("data/tiles.json"));
         world = new World80Graph.Builder()
-                            .addTile(Tile80.from(10, 10, "a", ImmutableSet.of(alive)))
-                            .addTile(Tile80.from(10, 9, "b", ImmutableSet.of(alive)))
-                            .addTile(Tile80.from(10, 8, "c", ImmutableSet.of(alive)))
-                            .addTile(Tile80.from(9, 10, "d", ImmutableSet.of(alive)))
-                            .addTile(Tile80.from(8, 9, "e", ImmutableSet.of(alive)))
+                            .addTile(Tile80.from(10, 10, "a",ImmutableSet.of("gof"), ImmutableSet.of(alive),ImmutableMap.of("self","wink")))
+                            .addTile(Tile80.from(10, 9, "b", ImmutableSet.of("gof"), ImmutableSet.of(alive),ImmutableMap.of("self","wink")))
+                            .addTile(Tile80.from(10, 8, "c", ImmutableSet.of("gof"), ImmutableSet.of(alive),ImmutableMap.of("self","wink")))
+                            .addTile(Tile80.from(9, 10, "d",ImmutableSet.of("gof"), ImmutableSet.of(alive),ImmutableMap.of("self","wink")))
+                            .addTile(Tile80.from(8, 9, "e", ImmutableSet.of("gof"), ImmutableSet.of(alive),ImmutableMap.of("self","wink")))
                             .build();
         click = Collections.newSetFromMap(new ConcurrentHashMap<Pair,Boolean>());
         pause=false;
@@ -166,7 +171,11 @@ public class Gof2 extends Ucigame{
             console.addMessage("play");
             World80Graph.Builder b = World80Graph.builder();
             for (Pair p : click)
-                b.addTile(Tile80.from(p,""+p.hashCode(),ImmutableSet.of(alive)));
+                b.addTile(Tile80.from(p,
+                                      ""+p.hashCode(),
+                                      ImmutableSet.of("gof"), 
+                                      ImmutableSet.of(alive),
+                                      ImmutableMap.of("self","wink")));
             click.clear();
             world = b.build();
         }

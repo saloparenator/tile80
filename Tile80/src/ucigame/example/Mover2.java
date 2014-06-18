@@ -16,6 +16,7 @@
 
 package ucigame.example;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import java.util.Map;
@@ -23,7 +24,7 @@ import java.util.Set;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import tile80.Console80;
-import tile80.Tag80;
+import tile80.Behavior80;
 import tile80.Tile80;
 import tile80.World80;
 import tile80.World80Graph;
@@ -47,7 +48,7 @@ public class Mover2 extends Ucigame{
     Set<String> event;
     int i;
     
-    Tag80 player = new Tag80(){
+    Behavior80 player = new Behavior80(){
         @Override
         public String getName() {
             return "player";
@@ -92,8 +93,11 @@ public class Mover2 extends Ucigame{
         console = new Console80UciGame(this, "Monospaced", 8, 255, 255, 255, 200);
         
         world = World80Graph.builder()
-                            .addSymbol("player", 30, 30)
-                            .addTag("player", player)
+                            .addTile(Tile80.from(30, 30, 
+                                                 "player", 
+                                                 ImmutableSet.of("player"), 
+                                                 ImmutableSet.of(player), 
+                                                 ImmutableMap.of("self","wink")))
                             .build();
         event = new HashSet();
         

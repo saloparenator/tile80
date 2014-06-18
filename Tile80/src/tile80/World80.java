@@ -16,6 +16,7 @@
 
 package tile80;
 
+import java.util.Map;
 import java.util.Set;
 import org.javatuples.Pair;
 
@@ -36,9 +37,19 @@ public interface World80 {
     String getDefaultId();
     /**
      * null replacement
-     * @return Tag80.nothing
+     * @return Behavior80.nothing
      */
-    Tag80 getDefaultTags();
+    Behavior80 getDefaultBehavior();
+    /**
+     * 
+     * @return 
+     */
+    String getDefaultTag();
+    /**
+     * 
+     * @return 
+     */
+    Map<String,String> getDefaultKeySpace();
     /**
      * tile that act if there is nothing
      * @return Tile80.nothing
@@ -67,7 +78,7 @@ public interface World80 {
      * @param tag
      * @return 
      */
-    Iterable<Tile80> getTileByTag(Tag80 tag);
+    Iterable<Tile80> getTileByTag(String tag);
     /**
      * find all tile within rect
      * @param topLeft
@@ -88,7 +99,19 @@ public interface World80 {
      * @param id
      * @return 
      */
-    Iterable<Tag80> getTagById(String id);
+    Iterable<String> getTagById(String id);
+    /**
+     * all behavior associated to the id
+     * @param id
+     * @return 
+     */
+    Iterable<Behavior80> getBehaviorById(String id);
+    /**
+     * the keyspace associated to the id
+     * @param id
+     * @return 
+     */
+    Map<String,String> getKeySpaceById(String id);
     
     /**
      * apply crunch on every tile with all related tag

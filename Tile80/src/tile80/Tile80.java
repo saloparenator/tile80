@@ -18,8 +18,11 @@ package tile80;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import java.util.Map;
 import java.util.Set;
 import org.javatuples.Pair;
 
@@ -29,18 +32,27 @@ import org.javatuples.Pair;
  */
 public abstract class Tile80 {
             
-    public static Tile80 from(Pair<Integer, Integer> pos, String id, Iterable<Tag80> tagLst){
-        return new byValue(pos, id, tagLst);
+    public static Tile80 from(Pair<Integer, Integer> pos, 
+                              String id, 
+                              Iterable<String> tagLst,
+                              Iterable<Behavior80> behaviorLst,
+                              Map<String,String> keyspace){
+        return new byValue(pos, id, tagLst,behaviorLst,keyspace);
     }
-    public static Tile80 from(int x, int y, String id, Iterable<Tag80> tagLst){
-        return new byValue(new Pair(x,y), id, tagLst);
+    public static Tile80 from(int x, int y, 
+                              String id, 
+                              Iterable<String> tagLst,
+                              Iterable<Behavior80> behaviorLst,
+                              Map<String,String> keyspace){
+        return new byValue(new Pair(x,y), id, tagLst,behaviorLst,keyspace);
     }
     public static Tile80 fromWorld(String id, World80 world){
         return new lazy(world, id);
     }
     public static Tile80 newEmpty(String id){
-        Set<Tag80> tags = ImmutableSet.of();
-        return new byValue(new Pair(0,0),id,tags);
+        Set lst = ImmutableSet.of();
+        Map map = ImmutableMap.of();
+        return new byValue(new Pair(0,0),id,lst,lst,map);
     }
     /**
      * getter
@@ -71,8 +83,18 @@ public abstract class Tile80 {
      * return a collection of tag associated to the tile
      * @return iterable<tag>
      */
-    public abstract Iterable<Tag80> getTags();
-    
+    public abstract Iterable<String> getTags();
+    /**
+     * 
+     * @return 
+     */
+    public abstract Iterable<Behavior80> getBehavior();
+    /**
+     * 
+     * @return 
+     */
+    public abstract String getFromKeyspace(String key);
+    public abstract Iterable<String> getKeyspace();
     /**
      * mutator return a modified copy
      * @param x relative x movement
@@ -105,13 +127,18 @@ public abstract class Tile80 {
      * @param tag the tag to add to the collection
      * @return  new version of the object
      */
-    public abstract Tile80 addTag(Tag80 tag);
+    public abstract Tile80 addTag(String tag);
     /**
      * mutator return a modified copy
      * @param tag the tag to remove
      * @return  new version of the object
      */
-    public abstract Tile80 removeTag(Tag80 tag);
+    public abstract Tile80 removeTag(String tag);
+    
+    public abstract Tile80 addBehavior(Behavior80 behavior);
+    public abstract Tile80 removeBehavior(Behavior80 behavior);
+    public abstract Tile80 addKey(String key, String value);
+    public abstract Tile80 removeKey(String key);
     
     /**
      * Self crunch with all tag it contains
@@ -122,7 +149,7 @@ public abstract class Tile80 {
     public Iterable<Tile80> crunch(World80 world, Set<String> event) {
         ImmutableSet.Builder<Tile80> ret = ImmutableSet.builder();
         Tile80 newTile = this;
-        for (Tag80 tag : getTags()){
+        for (Behavior80 tag : getBehavior()){
             Iterable<Tile80> tileLst = tag.crunch(newTile, world, event);
             newTile = findSelf(tileLst);
             for (Tile80 tile : FluentIterable.from(tileLst).filter(Predicates.not(Predicates.equalTo(newTile))))
@@ -160,10 +187,10 @@ public abstract class Tile80 {
         Tile80 t = (Tile80)o;
         if (t.getId().equals(this.getId()) &&
             t.getPos().equals(this.getPos())){
-            for (Tag80 tag : t.getTags())
+            for (String tag : t.getTags())
                 if (!Iterables.contains(this.getTags(), tag))
                     return false;
-            for(Tag80 tag:this.getTags())
+            for(String tag:this.getTags())
                 if (!Iterables.contains(t.getTags(), tag))
                     return false;
             return true;
@@ -193,7 +220,7 @@ public abstract class Tile80 {
         }
 
         @Override
-        public Iterable<Tag80> getTags() {
+        public Iterable<String> getTags() {
             return ImmutableSet.of();
         }
 
@@ -218,17 +245,52 @@ public abstract class Tile80 {
         }
 
         @Override
-        public Tile80 addTag(Tag80 tag) {
+        public Tile80 addTag(String tag) {
             return this;
         }
 
         @Override
-        public Tile80 removeTag(Tag80 tag) {
+        public Tile80 removeTag(String tag) {
             return this;
         }
 
         @Override
         public Iterable<Tile80> crunch(World80 world, Set<String> event) {
+            return ImmutableSet.of();
+        }
+
+        @Override
+        public Iterable<Behavior80> getBehavior() {
+            return ImmutableSet.of();
+        }
+
+        @Override
+        public String getFromKeyspace(String key) {
+            return "";
+        }
+
+        @Override
+        public Tile80 addBehavior(Behavior80 behavior) {
+            return this;
+        }
+
+        @Override
+        public Tile80 removeBehavior(Behavior80 behavior) {
+            return this;
+        }
+
+        @Override
+        public Tile80 addKey(String key, String value) {
+            return this;
+        }
+
+        @Override
+        public Tile80 removeKey(String key) {
+            return this;
+        }
+
+        @Override
+        public Iterable<String> getKeyspace() {
             return ImmutableSet.of();
         }
        
@@ -237,13 +299,26 @@ public abstract class Tile80 {
     private static class byValue extends Tile80{
         private final Pair<Integer,Integer> pos;
         private final String id;
-        private final Iterable<Tag80> tagLst;
+        private final Iterable<String> tagLst;
+        private final Iterable<Behavior80> behaviorLst;
+        private final Map<String,String> keyspace;
 
-        public byValue(Pair<Integer, Integer> pos, String id, Iterable<Tag80> tagLst) {
+        public byValue(Pair<Integer, Integer> pos, 
+                       String id, 
+                       Iterable<String> tagLst,
+                       Iterable<Behavior80> behaviorLst,
+                       Map<String,String> keyspace) {
             this.pos = pos;
             this.id = id;
             this.tagLst = tagLst;
+            this.behaviorLst=behaviorLst;
+            this.keyspace=keyspace;
         }
+        
+        public Map<String,String> getMap(){
+            return keyspace;
+        }
+        
         @Override
         public Pair<Integer, Integer> getPos() {
             return pos;
@@ -265,7 +340,7 @@ public abstract class Tile80 {
         }
 
         @Override
-        public Iterable<Tag80> getTags() {
+        public Iterable<String> getTags() {
             return tagLst;
         }
 
@@ -273,7 +348,9 @@ public abstract class Tile80 {
         public Tile80 movePos(int x, int y) {
             return new byValue(new Pair(getX()+x,getY()+y),
                                getId(),
-                               getTags());
+                               getTags(),
+                               getBehavior(),
+                               keyspace);
         }
 
         @Override
@@ -281,36 +358,98 @@ public abstract class Tile80 {
             return new byValue(new Pair(getX()+rpos.getValue0(),
                                         getY()+rpos.getValue1()),
                                getId(),
-                               getTags());
+                               getTags(),
+                               getBehavior(),
+                               keyspace);
         }
 
         @Override
         public Tile80 setPos(int x, int y) {
             return new byValue(new Pair(x,y),
                                getId(),
-                               getTags());
+                               getTags(),
+                               getBehavior(),
+                               keyspace);
         }
 
         @Override
         public Tile80 setPos(Pair<Integer,Integer> npos) {
             return new byValue(npos,
                                getId(),
-                               getTags());
+                               getTags(),
+                               getBehavior(),
+                               keyspace);
         }
 
         @Override
-        public Tile80 addTag(Tag80 tag) {
+        public Tile80 addTag(String tag) {
             return new byValue(getPos(),
                                getId(),
-                               Iterables.concat(ImmutableSet.of(tag),getTags()));    
+                               Iterables.concat(ImmutableSet.of(tag),getTags()),
+                               getBehavior(),
+                               keyspace);    
         }
 
         @Override
-        public Tile80 removeTag(Tag80 tag) {
+        public Tile80 removeTag(String tag) {
             return new byValue(getPos(),
                                getId(),
                                FluentIterable.from(getTags())
-                                             .filter(Predicates.not(Predicates.equalTo(tag))));    
+                                             .filter(Predicates.not(Predicates.equalTo(tag))),
+                               getBehavior(),
+                               keyspace);    
+        }
+
+        @Override
+        public Iterable<Behavior80> getBehavior() {
+            return behaviorLst;
+        }
+
+        @Override
+        public String getFromKeyspace(String key) {
+            return keyspace.get(key);
+        }
+
+        @Override
+        public Tile80 addBehavior(Behavior80 behavior) {
+            return new byValue(getPos(),
+                               getId(),
+                               getTags(),
+                               Iterables.concat(ImmutableSet.of(behavior),behaviorLst),
+                               getMap());
+        }
+
+        @Override
+        public Tile80 removeBehavior(Behavior80 behavior) {
+            return new byValue(getPos(),
+                               getId(),
+                               getTags(),
+                               FluentIterable.from(behaviorLst).filter(Predicates.not(Predicates.equalTo(behavior))),
+                               getMap());
+        }
+
+        @Override
+        public Tile80 addKey(String key, String value) {
+            Map map = ImmutableMap.builder().put(key,value).putAll(getMap()).build();
+            return new byValue(getPos(),
+                               getId(),
+                               getTags(),
+                               getBehavior(),
+                               map);
+        }
+
+        @Override
+        public Tile80 removeKey(String key) {
+            return new byValue(getPos(),
+                               getId(),
+                               getTags(),
+                               getBehavior(),
+                               Maps.filterKeys(getMap(), Predicates.equalTo(key)));
+        }
+
+        @Override
+        public Iterable<String> getKeyspace() {
+            return keyspace.keySet();
         }
 
     };
@@ -319,13 +458,24 @@ public abstract class Tile80 {
         private final World80 world;
         private final String id;
         private Pair<Integer,Integer> pos;
-        private Iterable<Tag80> tags;
+        private Iterable<String> tags;
+        private Iterable<Behavior80> behaviorLst;
+        private Map<String,String> keyspace;
 
-        public lazy(World80 world, String id) {
+        public lazy(World80 world, 
+                    String id) {
             this.world = world;
             this.id = id;
             pos=null;
             tags=null;
+            behaviorLst=null;
+            keyspace=null;
+        }
+        
+        private Map<String,String> getMap(){
+            if (keyspace==null)
+                keyspace=world.getKeySpaceById(id);
+            return keyspace;
         }
 
         @Override
@@ -355,7 +505,7 @@ public abstract class Tile80 {
         }
 
         @Override
-        public Iterable<Tag80> getTags() {
+        public Iterable<String> getTags() {
             if (tags==null)
                 tags=world.getTagById(id);
             return tags;
@@ -363,37 +513,115 @@ public abstract class Tile80 {
 
         @Override
         public Tile80 movePos(int x, int y) {
-            return Tile80.from(new Pair(getX()+x,getY()+y), getId(), getTags());
+            return Tile80.from(new Pair(getX()+x,getY()+y), 
+                               getId(), 
+                               getTags(),
+                               getBehavior(),
+                               getMap());
         }
 
         @Override
         public Tile80 movePos(Pair<Integer, Integer> pos) {
-            return Tile80.from(new Pair(getX()+pos.getValue0(),getY()+pos.getValue1()), getId(), getTags());
+            return Tile80.from(new Pair(getX()+pos.getValue0(),getY()+pos.getValue1()), 
+                               getId(), 
+                               getTags(),
+                               getBehavior(),
+                               getMap());
         }
 
         @Override
         public Tile80 setPos(int x, int y) {
-            return Tile80.from(new Pair(x,y), getId(), getTags());
+            return Tile80.from(new Pair(x,y), 
+                               getId(), 
+                               getTags(),
+                               getBehavior(),
+                               getMap());
         }
 
         @Override
         public Tile80 setPos(Pair<Integer, Integer> pos) {
-            return Tile80.from(pos, getId(), getTags());
+            return Tile80.from(pos, 
+                               getId(), 
+                               getTags(),
+                               getBehavior(),
+                               getMap());
         }
 
         @Override
-        public Tile80 addTag(Tag80 tag) {
+        public Tile80 addTag(String tag) {
             return new byValue(getPos(),
                                getId(),
-                               Iterables.concat(ImmutableSet.of(tag),getTags()));    
+                               Iterables.concat(ImmutableSet.of(tag),getTags()),
+                               getBehavior(),
+                               getMap());    
         }
 
         @Override
-        public Tile80 removeTag(Tag80 tag) {
+        public Tile80 removeTag(String tag) {
             return new byValue(getPos(),
                                getId(),
                                FluentIterable.from(getTags())
-                                             .filter(Predicates.not(Predicates.equalTo(tag))));    
+                                             .filter(Predicates.not(Predicates.equalTo(tag))),
+                               getBehavior(),
+                               getMap());    
+        }
+
+        @Override
+        public Iterable<Behavior80> getBehavior() {
+            if (behaviorLst==null)
+                behaviorLst=world.getBehaviorById(id);
+            return behaviorLst;
+        }
+
+        @Override
+        public String getFromKeyspace(String key) {
+            if(keyspace==null)
+                keyspace=world.getKeySpaceById(id);
+            return keyspace.get(key);
+        }
+
+        @Override
+        public Tile80 addBehavior(Behavior80 behavior) {
+            return new byValue(getPos(),
+                               getId(),
+                               getTags(),
+                               Iterables.concat(ImmutableSet.of(behavior),behaviorLst),
+                               getMap());
+        }
+
+        @Override
+        public Tile80 removeBehavior(Behavior80 behavior) {
+            return new byValue(getPos(),
+                               getId(),
+                               getTags(),
+                               FluentIterable.from(behaviorLst).filter(Predicates.not(Predicates.equalTo(behavior))),
+                               getMap());
+        }
+
+        @Override
+        public Tile80 addKey(String key, String value) {
+            Map map = ImmutableMap.builder().put(key,value).putAll(getMap()).build();
+            return new byValue(getPos(),
+                               getId(),
+                               getTags(),
+                               getBehavior(),
+                               map);
+        }
+
+        @Override
+        public Tile80 removeKey(String key) {
+            return new byValue(getPos(),
+                               getId(),
+                               getTags(),
+                               getBehavior(),
+                               Maps.filterKeys(getMap(), Predicates.equalTo(key)));
+        }
+
+        @Override
+        public Iterable<String> getKeyspace() {
+            if(keyspace==null)
+                keyspace=world.getKeySpaceById(id);
+            return keyspace.keySet();
         }
 
     };

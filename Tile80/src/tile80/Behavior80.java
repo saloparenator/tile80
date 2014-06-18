@@ -23,8 +23,8 @@ import java.util.Set;
  *
  * @author martin
  */
-public abstract class Tag80 {
-    public static Tag80 makeTag(String name, String description){
+public abstract class Behavior80 {
+    public static Behavior80 makeTag(String name, String description){
         return new Tag(name,description);
     }
     /**
@@ -59,7 +59,7 @@ public abstract class Tag80 {
         return o==this;
     }
     
-    private static final class Tag extends Tag80{
+    private static final class Tag extends Behavior80{
         private final String name;
         private final String description;
 
@@ -85,7 +85,7 @@ public abstract class Tag80 {
         
     }
     
-    public static final Tag80 nothing = new Tag80(){
+    public static final Behavior80 nothing = new Behavior80(){
         @Override
         public String getName() {
             return "";

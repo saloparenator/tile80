@@ -19,8 +19,10 @@ package tile80;
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
+import java.util.Map;
 import java.util.Set;
 import org.javatuples.Pair;
 import tool.PredicatesOnList;
@@ -46,8 +48,8 @@ public class World80HOF implements World80 {
     }
 
     @Override
-    public Tag80 getDefaultTags() {
-        return Tag80.nothing;
+    public Behavior80 getDefaultBehavior() {
+        return Behavior80.nothing;
     }
 
     @Override
@@ -89,15 +91,15 @@ public class World80HOF implements World80 {
                              .first()
                              .or(Tile80.nothing);    }
 
-    private static final Function<Tile80,Iterable<Tag80>> onlyTag = new Function<Tile80,Iterable<Tag80>>(){
+    private static final Function<Tile80,Iterable<String>> onlyTag = new Function<Tile80,Iterable<String>>(){
         @Override
-        public Iterable<Tag80> apply(Tile80 input) {
+        public Iterable<String> apply(Tile80 input) {
             return input.getTags();
         }   
     };
     
     @Override
-    public Iterable<Tile80> getTileByTag(Tag80 tag) {
+    public Iterable<Tile80> getTileByTag(String tag) {
         return FluentIterable.from(world)
                              .filter(Predicates.compose(PredicatesOnList.contains(tag),onlyTag));          
     }
@@ -114,7 +116,7 @@ public class World80HOF implements World80 {
     }
 
     @Override
-    public Iterable<Tag80> getTagById(String id) {
+    public Iterable<String> getTagById(String id) {
         return getTileById(id).getTags();
     }
     
@@ -125,6 +127,30 @@ public class World80HOF implements World80 {
             for (Tile80 ntile : tile.crunch(this, event))
                 nextFrame.addTile(ntile);
         return nextFrame.build();
+    }
+
+    @Override
+    public String getDefaultTag() {
+        return "";
+    }
+
+    @Override
+    public Map<String, String> getDefaultKeySpace() {
+        return ImmutableMap.of();
+    }
+
+    @Override
+    public Iterable<Behavior80> getBehaviorById(String id) {
+        return getTileById(id).getBehavior();
+    }
+
+    @Override
+    public Map<String, String> getKeySpaceById(String id) {
+        ImmutableMap.Builder b = ImmutableMap.builder();
+        Tile80 t = getTileById(id);
+        for (String key : t.getKeyspace())
+            b.put(key, t.getFromKeyspace(key));
+        return b.build();
     }
 
     public static class Builder{

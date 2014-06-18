@@ -20,11 +20,14 @@ import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.BiMap;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Range;
+import com.google.common.collect.Table;
+import java.util.Map;
 import java.util.Set;
 import org.javatuples.Pair;
 import tool.Graph;
@@ -37,13 +40,19 @@ import tool.Link;
  * @author martin
  */
 public class World80Graph implements World80{
-    private final Graph<String,Tag80> graph;
+    private final Graph<String,String> graph;
     private final Link<String,Pair<Integer,Integer>> coord;
+    private final ImmutableMultimap<String,Behavior80> behaviorLst;
+    private final ImmutableTable<String,String,String> keyspace;
 
-    private World80Graph(Graph<String, Tag80> graph, 
-                            Link<String, Pair<Integer,Integer>> coord) {
+    private World80Graph(Graph<String, String> graph, 
+                         Link<String, Pair<Integer,Integer>> coord,
+                         ImmutableMultimap<String,Behavior80> behaviorLst,
+                         ImmutableTable<String,String,String> keyspace) {
         this.graph = graph;
         this.coord = coord;
+        this.behaviorLst=behaviorLst;
+        this.keyspace=keyspace;
     }
     
     public static World80Graph.Builder builder(){
@@ -56,8 +65,8 @@ public class World80Graph implements World80{
     }
 
     @Override
-    public Tag80 getDefaultTags() {
-        return Tag80.nothing;
+    public Behavior80 getDefaultBehavior() {
+        return Behavior80.nothing;
     }
 
     @Override
@@ -71,19 +80,19 @@ public class World80Graph implements World80{
         return Objects.firstNonNull(coord.getLeft(symbol),getDefaultPos());
     }
 
-    private Function<Tag80,Set<String>> getTagSymbolFunc(){
-        return new Function<Tag80, Set<String>>() {
+    private Function<String,Set<String>> getTagSymbolFunc(){
+        return new Function<String, Set<String>>() {
             @Override
-            public Set<String> apply(Tag80 input) {
+            public Set<String> apply(String input) {
                 return graph.neighborRight(input);
             }
         };
     }
 
     @Override
-    public Iterable<Tag80> getTagById(String symbol) {
-        Preconditions.checkNotNull(symbol);
-        return graph.neighborLeft(symbol);
+    public Iterable<String> getTagById(String id) {
+        Preconditions.checkNotNull(id);
+        return graph.neighborLeft(id);
     }
 
     @Override
@@ -109,19 +118,23 @@ public class World80Graph implements World80{
         String id = coord.getRight(pos);
         if (id==null || "".equals(id))
             return Tile80.nothing;
-        return Tile80.from(pos, id, getTagById(id));
+        return Tile80.from(pos, id, getTagById(id), getBehaviorById(id), getKeySpaceById(id));
     }
 
     @Override
-    public Tile80 getTileById(String symbol) {
-        Preconditions.checkNotNull(symbol);
-        if (coord.leftSet().contains(symbol))
-            return Tile80.from(coord.getLeft(symbol),symbol,getTagById(symbol));
+    public Tile80 getTileById(String id) {
+        Preconditions.checkNotNull(id);
+        if (coord.leftSet().contains(id))
+            return Tile80.from(coord.getLeft(id),
+                               id,
+                               getTagById(id), 
+                               getBehaviorById(id), 
+                               getKeySpaceById(id));
         return Tile80.nothing;
     }
 
     @Override
-    public Iterable<Tile80> getTileByTag(Tag80 tag) {
+    public Iterable<Tile80> getTileByTag(String tag) {
         return FluentIterable.from(graph.neighborRight(tag)).transform(toTile80);
     }
 
@@ -137,11 +150,33 @@ public class World80Graph implements World80{
     @Override
     public World80 crunch(Set<String> event) {
         World80Graph.Builder nextFrame = World80Graph.builder();
-        for (Tile80 tile : getTileLst())
-            for (Tile80 ntile : tile.crunch(this, event))
+        for (Tile80 tile : getTileLst()){
+            for (Tile80 ntile : tile.crunch(this, event)){
                 nextFrame.addTile(ntile);
+            }
+        }
         World80 w = nextFrame.build();
         return w;
+    }
+
+    @Override
+    public String getDefaultTag() {
+        return "";
+    }
+
+    @Override
+    public Map<String, String> getDefaultKeySpace() {
+        return ImmutableMap.of();
+    }
+
+    @Override
+    public Iterable<Behavior80> getBehaviorById(String id) {
+        return behaviorLst.get(id);
+    }
+
+    @Override
+    public Map<String, String> getKeySpaceById(String id) {
+        return keyspace.row(id);
     }
     
     /**
@@ -150,34 +185,37 @@ public class World80Graph implements World80{
      * @param <T> 
      */
     public static class Builder{
-        private final Graph.Builder<String,Tag80> graph;
+        private final Graph.Builder<String,String> graph;
         private final Link.Builder<String,Pair<Integer,Integer>> coord;
+        private final ImmutableMultimap.Builder<String,Behavior80> behaviorLst;
+        private final Table<String,String,String> keyspace;
 
         public Builder() {
             graph = Graph.builder();
             coord = Link.builder();
+            behaviorLst = ImmutableMultimap.builder();
+            keyspace = HashBasedTable.create();
         }
         
         public World80Graph build(){
-            return new World80Graph(graph.build(), coord.build());
+            return new World80Graph(graph.build(), 
+                                    coord.build(),
+                                    behaviorLst.build(),
+                                    ImmutableTable.copyOf(keyspace));
         }
 
         public Builder addTile(Tile80 tile){
             coord.link(tile.getId(), tile.getPos());
-            for (Tag80 tag : tile.getTags())
+            for (String tag : tile.getTags())
                 graph.link(tile.getId(), tag);
+            for (Behavior80 behavior : tile.getBehavior())
+                behaviorLst.put(tile.getId(), behavior);
+            for (String key : tile.getKeyspace())
+                keyspace.put(tile.getId(),key , tile.getFromKeyspace(key));
             return this;
         }
-        
-        public Builder addTag(String symbol, Tag80 tag) {
-            graph.link(symbol, tag);
-            return this;
-        }
+       
 
-        public Builder addSymbol(String symbol, int x, int y) {
-            coord.link(symbol, new Pair(x,y));
-            return this;
-        }
     }
  
 }

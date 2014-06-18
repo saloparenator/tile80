@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import java.util.Map;
 import java.util.Set;
 import org.javatuples.Pair;
 import org.junit.Assert;
@@ -24,7 +26,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import tile80.Tag80;
+import tile80.Behavior80;
 import tile80.Tile80;
 import tile80.World80;
 import tile80.World80Graph;
@@ -44,11 +46,12 @@ public class testTile80 {
         
     @Before
     public void setUp() {
-        player=Tile80.from(20,20,"player",ImmutableSet.of(un,deux));
-        blockUnder=Tile80.from(20,21,"blockUnder",ImmutableSet.of(trois));
-        blockOver=Tile80.from(20,19,"blockOver",ImmutableSet.of(trois));
-        blockintheair=Tile80.from(15,15,"blockintheair",ImmutableSet.of(trois));
-        blockWall=Tile80.from(22,20,"blockWall",ImmutableSet.of(deux,trois));
+        Map<String,String> m = ImmutableMap.of();
+        player=Tile80.from(20,20,"player",ImmutableSet.of("un","deux"),ImmutableSet.of(un,deux),m);
+        blockUnder=Tile80.from(20,21,"blockUnder",ImmutableSet.of("trois"),ImmutableSet.of(trois),m);
+        blockOver=Tile80.from(20,19,"blockOver",ImmutableSet.of("trois"),ImmutableSet.of(trois),m);
+        blockintheair=Tile80.from(15,15,"blockintheair",ImmutableSet.of("trois"),ImmutableSet.of(trois),m);
+        blockWall=Tile80.from(22,20,"blockWall",ImmutableSet.of("trois","deux"),ImmutableSet.of(deux,trois),m);
         tileWorld = World80Graph.builder()
                                 .addTile(player)
                                 .addTile(blockUnder)
@@ -60,26 +63,26 @@ public class testTile80 {
     
     @Test
     public void testGetTileByTagUn(){
-        assertTrue(Iterables.contains(tileWorld.getTileByTag(un),player));
+        assertTrue(Iterables.contains(tileWorld.getTileByTag("un"),player));
     }
     
     @Test
     public void testGetTileByTagDeux(){
-        assertTrue(Iterables.contains(tileWorld.getTileByTag(deux),player));
-        assertTrue(Iterables.contains(tileWorld.getTileByTag(deux),blockWall));
+        assertTrue(Iterables.contains(tileWorld.getTileByTag("deux"),player));
+        assertTrue(Iterables.contains(tileWorld.getTileByTag("deux"),blockWall));
     }
     
     @Test
     public void testGetTileByTagTrois(){
-        assertTrue(Iterables.contains(tileWorld.getTileByTag(trois),blockUnder));
-        assertTrue(Iterables.contains(tileWorld.getTileByTag(trois),blockOver));
-        assertTrue(Iterables.contains(tileWorld.getTileByTag(trois),blockintheair));
-        assertTrue(Iterables.contains(tileWorld.getTileByTag(trois),blockWall));
+        assertTrue(Iterables.contains(tileWorld.getTileByTag("trois"),blockUnder));
+        assertTrue(Iterables.contains(tileWorld.getTileByTag("trois"),blockOver));
+        assertTrue(Iterables.contains(tileWorld.getTileByTag("trois"),blockintheair));
+        assertTrue(Iterables.contains(tileWorld.getTileByTag("trois"),blockWall));
     }
     
     @Test
     public void testGetTileByTagNothing(){
-        assertEquals(0,Iterables.size(tileWorld.getTileByTag(quatre)));
+        assertEquals(0,Iterables.size(tileWorld.getTileByTag("quatre")));
     }
     
     @Test(expected = NullPointerException.class)
@@ -213,18 +216,24 @@ public class testTile80 {
     
     @Test
     public void testAddTileDuplicateId(){
+        Map<String,String> m = ImmutableMap.of();
         World80 test = World80Graph.builder()
                                    .addTile(player)
-                                   .addTile(Tile80.from(1, 2, "player", ImmutableSet.of(un)))
+                                   .addTile(Tile80.from(1, 2, "player",ImmutableSet.of("un"), ImmutableSet.of(un),m))
                                    .build();
         assertEquals(1, Iterables.size(test.getTileLst()));
     }
     
     @Test
     public void testAddTileDuplicatePos(){
+        Map<String,String> m = ImmutableMap.of();
         World80 test = World80Graph.builder()
                                    .addTile(player)
-                                   .addTile(Tile80.from(20, 20, "id", ImmutableSet.of(un)))
+                                   .addTile(Tile80.from(20, 20, 
+                                                        "id",
+                                                        ImmutableSet.of("un"), 
+                                                        ImmutableSet.of(un),
+                                                        m))
                                    .build();
         assertEquals(1, Iterables.size(test.getTileLst()));
     }
@@ -236,7 +245,7 @@ public class testTile80 {
     /*________________________________________________________________________*/
     /*________________________________________________________________________*/
     
-    Tag80 un = new Tag80(){
+    Behavior80 un = new Behavior80(){
 
         @Override
         public String getName() {
@@ -254,7 +263,7 @@ public class testTile80 {
         }
            
     };
-    Tag80 deux = new Tag80(){
+    Behavior80 deux = new Behavior80(){
 
         @Override
         public String getName() {
@@ -271,7 +280,7 @@ public class testTile80 {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     };
-    Tag80 trois = new Tag80(){
+    Behavior80 trois = new Behavior80(){
 
         @Override
         public String getName() {
@@ -289,7 +298,7 @@ public class testTile80 {
         }
 
     };
-    Tag80 quatre = new Tag80(){
+    Behavior80 quatre = new Behavior80(){
 
         @Override
         public String getName() {
