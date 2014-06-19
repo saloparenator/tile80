@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import org.javatuples.Pair;
@@ -140,6 +141,9 @@ public abstract class Tile80 {
     public abstract Tile80 addKey(String key, String value);
     public abstract Tile80 removeKey(String key);
     
+    public boolean isNothing(){
+        return false;
+    }
     /**
      * Self crunch with all tag it contains
      * @param world
@@ -204,6 +208,10 @@ public abstract class Tile80 {
             return new Pair(0,0);
         }
 
+        @Override
+        public boolean isNothing(){
+            return true;
+        }
         @Override
         public int getX() {
             return 0;
@@ -430,12 +438,14 @@ public abstract class Tile80 {
 
         @Override
         public Tile80 addKey(String key, String value) {
-            Map map = ImmutableMap.builder().put(key,value).putAll(getMap()).build();
+            Map map = new HashMap();
+            map.putAll(getMap());
+            map.put(key, value);
             return new byValue(getPos(),
                                getId(),
                                getTags(),
                                getBehavior(),
-                               map);
+                               ImmutableMap.copyOf(map));
         }
 
         @Override
@@ -600,12 +610,14 @@ public abstract class Tile80 {
 
         @Override
         public Tile80 addKey(String key, String value) {
-            Map map = ImmutableMap.builder().put(key,value).putAll(getMap()).build();
+            Map map = new HashMap();
+            map.putAll(getMap());
+            map.put(key, value);
             return new byValue(getPos(),
                                getId(),
                                getTags(),
                                getBehavior(),
-                               map);
+                               ImmutableMap.copyOf(map));
         }
 
         @Override

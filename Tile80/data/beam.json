@@ -1,0 +1,6 @@
+{
+"file": "data/beam.png","w":8,"h":8,"sheet":[
+{"name":"beamVertical","x":0.0,"y":0.0},
+{"name":"beamHorizontal","x":8.0,"y":0.0}
+]
+}

@@ -125,7 +125,8 @@ public class World80HOF implements World80 {
         World80HOF.Builder nextFrame = new World80HOF.Builder();
         for (Tile80 tile : getTileLst())
             for (Tile80 ntile : tile.crunch(this, event))
-                nextFrame.addTile(ntile);
+                if (!ntile.isNothing())
+                    nextFrame.addTile(ntile);
         return nextFrame.build();
     }
 

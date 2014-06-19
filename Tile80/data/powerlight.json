@@ -1,0 +1,6 @@
+{
+"file": "data/powerlight.png","w":8,"h":8,"sheet":[
+{"name":"powerlightOff","x":0.0,"y":0.0},
+{"name":"powerlightOn","x":8.0,"y":0.0}
+]
+}

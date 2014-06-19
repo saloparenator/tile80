@@ -152,7 +152,8 @@ public class World80Graph implements World80{
         World80Graph.Builder nextFrame = World80Graph.builder();
         for (Tile80 tile : getTileLst()){
             for (Tile80 ntile : tile.crunch(this, event)){
-                nextFrame.addTile(ntile);
+                if (!ntile.isNothing())
+                    nextFrame.addTile(ntile);
             }
         }
         World80 w = nextFrame.build();
