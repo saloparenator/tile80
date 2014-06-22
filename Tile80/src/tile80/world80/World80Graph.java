@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package tile80;
+package tile80.world80;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
@@ -30,6 +30,8 @@ import com.google.common.collect.Table;
 import java.util.Map;
 import java.util.Set;
 import org.javatuples.Pair;
+import tile80.tile80.Tile80;
+import tile80.behaviors80.Behavior80;
 import tool.Graph;
 import tool.Link;
 
@@ -39,7 +41,7 @@ import tool.Link;
  * 
  * @author martin
  */
-public class World80Graph implements World80{
+public class World80Graph extends World80{
     private final Graph<String,String> graph;
     private final Link<String,Pair<Integer,Integer>> coord;
     private final ImmutableMultimap<String,Behavior80> behaviorLst;
@@ -58,22 +60,7 @@ public class World80Graph implements World80{
     public static World80Graph.Builder builder(){
         return new World80Graph.Builder();
     }
-    
-    @Override
-    public String getDefaultId() {
-        return "";
-    }
 
-    @Override
-    public Behavior80 getDefaultBehavior() {
-        return Behavior80.nothing;
-    }
-
-    @Override
-    public Pair getDefaultPos() {
-        return getDefaultTile().getPos();
-    }
-    
     @Override
     public Pair getPosById(String symbol) {
         Preconditions.checkNotNull(symbol);
@@ -90,14 +77,9 @@ public class World80Graph implements World80{
     }
 
     @Override
-    public Iterable<String> getTagById(String id) {
+    public Set<String> getTagById(String id) {
         Preconditions.checkNotNull(id);
         return graph.neighborLeft(id);
-    }
-
-    @Override
-    public Tile80 getDefaultTile() {
-        return Tile80.nothing;
     }
 
     private final Function<String,Tile80> toTile80 = new Function<String, Tile80>() {
@@ -109,7 +91,8 @@ public class World80Graph implements World80{
     
     @Override
     public Iterable<Tile80> getTileLst() {
-        return FluentIterable.from(coord.leftSet()).transform(toTile80);
+        return FluentIterable.from(coord.leftSet())
+                             .transform(toTile80);
     }
 
     @Override
@@ -150,24 +133,12 @@ public class World80Graph implements World80{
     @Override
     public World80 crunch(Set<String> event) {
         World80Graph.Builder nextFrame = World80Graph.builder();
-        for (Tile80 tile : getTileLst()){
-            for (Tile80 ntile : tile.crunch(this, event)){
-                if (!ntile.isNothing())
-                    nextFrame.addTile(ntile);
-            }
-        }
-        World80 w = nextFrame.build();
-        return w;
+        return crunchWith(nextFrame, event);
     }
 
     @Override
     public String getDefaultTag() {
         return "";
-    }
-
-    @Override
-    public Map<String, String> getDefaultKeySpace() {
-        return ImmutableMap.of();
     }
 
     @Override
@@ -185,7 +156,7 @@ public class World80Graph implements World80{
      * @param <S>
      * @param <T> 
      */
-    public static class Builder{
+    public static class Builder implements World80.Builder{
         private final Graph.Builder<String,String> graph;
         private final Link.Builder<String,Pair<Integer,Integer>> coord;
         private final ImmutableMultimap.Builder<String,Behavior80> behaviorLst;
@@ -198,6 +169,7 @@ public class World80Graph implements World80{
             keyspace = HashBasedTable.create();
         }
         
+        @Override
         public World80Graph build(){
             return new World80Graph(graph.build(), 
                                     coord.build(),
@@ -205,13 +177,14 @@ public class World80Graph implements World80{
                                     ImmutableTable.copyOf(keyspace));
         }
 
+        @Override
         public Builder addTile(Tile80 tile){
             coord.link(tile.getId(), tile.getPos());
             for (String tag : tile.getTags())
                 graph.link(tile.getId(), tag);
             for (Behavior80 behavior : tile.getBehavior())
                 behaviorLst.put(tile.getId(), behavior);
-            for (String key : tile.getKeyspace())
+            for (String key : tile.getKeyspace().keySet())
                 keyspace.put(tile.getId(),key , tile.getFromKeyspace(key));
             return this;
         }

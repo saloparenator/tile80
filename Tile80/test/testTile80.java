@@ -26,10 +26,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import tile80.Behavior80;
-import tile80.Tile80;
-import tile80.World80;
-import tile80.World80Graph;
+import tile80.behaviors80.Behavior80;
+import tile80.tile80.Tile80;
+import tile80.world80.World80;
+import tile80.world80.World80Graph;
 
 /**
  *

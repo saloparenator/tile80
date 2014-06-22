@@ -1,0 +1,47 @@
+{
+"type": "world",
+"tiles":[
+    {"tags":["gof"],"id":"a","behaviors":["gof"],"keyspace":{"self":"wink"},"y":10,"x":10},
+    {"tags":["gof"],"id":"b","behaviors":["gof"],"keyspace":{"self":"wink"},"y":10,"x":11},
+    {"tags":["gof"],"id":"c","behaviors":["gof"],"keyspace":{"self":"wink"},"y":11,"x":10},
+    {"tags":["gof"],"id":"d","behaviors":["gof"],"keyspace":{"self":"wink"},"y":11,"x":11},
+    
+    {"tags":["gof"],"id":"e","behaviors":["gof"],"keyspace":{"self":"wink"},"y":10,"x":20},
+    {"tags":["gof"],"id":"f","behaviors":["gof"],"keyspace":{"self":"wink"},"y":11,"x":20},
+    {"tags":["gof"],"id":"g","behaviors":["gof"],"keyspace":{"self":"wink"},"y":12,"x":20},
+    {"tags":["gof"],"id":"h","behaviors":["gof"],"keyspace":{"self":"wink"},"y":13,"x":21},
+    {"tags":["gof"],"id":"i","behaviors":["gof"],"keyspace":{"self":"wink"},"y":14,"x":22},
+    {"tags":["gof"],"id":"j","behaviors":["gof"],"keyspace":{"self":"wink"},"y":14,"x":23},
+    {"tags":["gof"],"id":"k","behaviors":["gof"],"keyspace":{"self":"wink"},"y":9,"x":21},
+    {"tags":["gof"],"id":"l","behaviors":["gof"],"keyspace":{"self":"wink"},"y":8,"x":22},
+    {"tags":["gof"],"id":"m","behaviors":["gof"],"keyspace":{"self":"wink"},"y":8,"x":23},
+    
+    {"tags":["gof"],"id":"n","behaviors":["gof"],"keyspace":{"self":"wink"},"y":11,"x":24},
+    
+    {"tags":["gof"],"id":"o","behaviors":["gof"],"keyspace":{"self":"wink"},"y":9,"x":25},
+    {"tags":["gof"],"id":"p","behaviors":["gof"],"keyspace":{"self":"wink"},"y":10,"x":26},
+    {"tags":["gof"],"id":"q","behaviors":["gof"],"keyspace":{"self":"wink"},"y":11,"x":26},
+    {"tags":["gof"],"id":"r","behaviors":["gof"],"keyspace":{"self":"wink"},"y":12,"x":26},
+    {"tags":["gof"],"id":"s","behaviors":["gof"],"keyspace":{"self":"wink"},"y":11,"x":27},
+    {"tags":["gof"],"id":"t","behaviors":["gof"],"keyspace":{"self":"wink"},"y":13,"x":25},
+    
+    {"tags":["gof"],"id":"u","behaviors":["gof"],"keyspace":{"self":"wink"},"y":10,"x":30},
+    {"tags":["gof"],"id":"v","behaviors":["gof"],"keyspace":{"self":"wink"},"y":10,"x":31},
+    {"tags":["gof"],"id":"w","behaviors":["gof"],"keyspace":{"self":"wink"},"y":9,"x":30},
+    {"tags":["gof"],"id":"x","behaviors":["gof"],"keyspace":{"self":"wink"},"y":9,"x":31},
+    {"tags":["gof"],"id":"y","behaviors":["gof"],"keyspace":{"self":"wink"},"y":8,"x":30},
+    {"tags":["gof"],"id":"z","behaviors":["gof"],"keyspace":{"self":"wink"},"y":8,"x":31},
+    {"tags":["gof"],"id":"1","behaviors":["gof"],"keyspace":{"self":"wink"},"y":7,"x":32},
+    {"tags":["gof"],"id":"2","behaviors":["gof"],"keyspace":{"self":"wink"},"y":11,"x":32},
+    
+    {"tags":["gof"],"id":"3","behaviors":["gof"],"keyspace":{"self":"wink"},"y":7,"x":34},
+    {"tags":["gof"],"id":"4","behaviors":["gof"],"keyspace":{"self":"wink"},"y":6,"x":34},
+    {"tags":["gof"],"id":"5","behaviors":["gof"],"keyspace":{"self":"wink"},"y":11,"x":34},
+    {"tags":["gof"],"id":"6","behaviors":["gof"],"keyspace":{"self":"wink"},"y":12,"x":34},
+    
+    {"tags":["gof"],"id":"7","behaviors":["gof"],"keyspace":{"self":"wink"},"y":9,"x":44},
+    {"tags":["gof"],"id":"8","behaviors":["gof"],"keyspace":{"self":"wink"},"y":8,"x":44},
+    {"tags":["gof"],"id":"9","behaviors":["gof"],"keyspace":{"self":"wink"},"y":9,"x":45},
+    {"tags":["gof"],"id":"10","behaviors":["gof"],"keyspace":{"self":"wink"},"y":8,"x":45}
+]
+}

@@ -1,0 +1,6 @@
+{
+"type": "world",
+"tiles":[
+    {"tags":["gof"],"id":"d","behaviors":["gof"],"keyspace":{"self":"wink"},"y":10,"x":9},{"tags":["gof"],"id":"e","behaviors":["gof"],"keyspace":{"self":"wink"},"y":9,"x":8},{"tags":["gof"],"id":"b","behaviors":["gof"],"keyspace":{"self":"wink"},"y":9,"x":10},{"tags":["gof"],"id":"c","behaviors":["gof"],"keyspace":{"self":"wink"},"y":8,"x":10},{"tags":["gof"],"id":"a","behaviors":["gof"],"keyspace":{"self":"wink"},"y":10,"x":10}
+]
+}

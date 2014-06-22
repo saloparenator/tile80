@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package tile80;
+package tile80.world80;
 
+import tile80.behaviors80.Behavior80;
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
@@ -25,36 +26,17 @@ import com.google.common.collect.Range;
 import java.util.Map;
 import java.util.Set;
 import org.javatuples.Pair;
+import tile80.tile80.Tile80;
 import tool.PredicatesOnList;
 
 /**
  *
  * @author martin
  */
-public class World80HOF implements World80 {
+public class World80HOF extends World80 {
     private final ImmutableSet<Tile80> world;
     private World80HOF(ImmutableSet<Tile80> world){
         this.world = world;
-    }
-
-    @Override
-    public Pair getDefaultPos() {
-        return getDefaultTile().getPos();
-    }
-
-    @Override
-    public String getDefaultId() {
-        return "";
-    }
-
-    @Override
-    public Behavior80 getDefaultBehavior() {
-        return Behavior80.nothing;
-    }
-
-    @Override
-    public Tile80 getDefaultTile() {
-        return Tile80.nothing;
     }
 
     @Override
@@ -116,28 +98,14 @@ public class World80HOF implements World80 {
     }
 
     @Override
-    public Iterable<String> getTagById(String id) {
+    public Set<String> getTagById(String id) {
         return getTileById(id).getTags();
     }
-    
+
     @Override
     public World80 crunch(Set<String> event) {
-        World80HOF.Builder nextFrame = new World80HOF.Builder();
-        for (Tile80 tile : getTileLst())
-            for (Tile80 ntile : tile.crunch(this, event))
-                if (!ntile.isNothing())
-                    nextFrame.addTile(ntile);
-        return nextFrame.build();
-    }
-
-    @Override
-    public String getDefaultTag() {
-        return "";
-    }
-
-    @Override
-    public Map<String, String> getDefaultKeySpace() {
-        return ImmutableMap.of();
+        World80.Builder nextFrame = World80HOF.builder();
+        return crunchWith(nextFrame, event);
     }
 
     @Override
@@ -149,22 +117,27 @@ public class World80HOF implements World80 {
     public Map<String, String> getKeySpaceById(String id) {
         ImmutableMap.Builder b = ImmutableMap.builder();
         Tile80 t = getTileById(id);
-        for (String key : t.getKeyspace())
+        for (String key : t.getKeyspace().keySet())
             b.put(key, t.getFromKeyspace(key));
         return b.build();
     }
 
-    public static class Builder{
+    public static Builder builder(){
+        return new HOFBuilder();
+    }
+    public static class HOFBuilder implements World80.Builder{
         private final ImmutableSet.Builder<Tile80> world;
-        public Builder(){
+        public HOFBuilder(){
             world = ImmutableSet.builder();
         }
         
+        @Override
         public Builder addTile(Tile80 tile){
             world.add(tile);
             return this;
         }
 
+        @Override
         public World80 build(){
             return new World80HOF(world.build());
         }
